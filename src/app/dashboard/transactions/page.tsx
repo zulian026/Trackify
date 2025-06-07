@@ -159,16 +159,16 @@ export default function TransactionsPage() {
                 </span>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Saldo bulan ini
-            </p>
+            <p className="text-xs text-muted-foreground">Saldo bulan ini</p>
           </CardContent>
         </Card>
 
         {/* Total Pemasukan */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Pemasukan</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Pemasukan
+            </CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -210,7 +210,9 @@ export default function TransactionsPage() {
         {/* Jumlah Transaksi */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Jumlah Transaksi</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Jumlah Transaksi
+            </CardTitle>
             <Badge variant="secondary">
               {loadingSummary ? "..." : summary?.transaction_count || 0}
             </Badge>

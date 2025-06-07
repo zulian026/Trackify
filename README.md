@@ -1,25 +1,31 @@
 # Trackify 💰
 
+**🔗 Live Demo:** [https://trackify-ten.vercel.app/](https://trackify-ten.vercel.app/)
+
 Aplikasi manajemen keuangan personal yang membantu Anda mencatat, memantau, dan menganalisis pemasukan serta pengeluaran dengan mudah dan efisien.
 
 ## 🚀 Fitur Utama
 
 ### 📝 Manajemen Transaksi
+
 - **Input Transaksi**: Catat pemasukan dan pengeluaran dengan kategori, tanggal, dan deskripsi
 - **Transaksi Berulang**: Otomatisasi untuk transaksi rutin (harian, mingguan, bulanan, tahunan)
 - **Kategori Kustom**: Kelola kategori dengan warna dan ikon yang dapat disesuaikan
 
 ### 📊 Analisis & Visualisasi
+
 - **Dashboard Ringkasan**: Lihat saldo, total pemasukan, dan pengeluaran per periode
 - **Grafik Interaktif**: Visualisasi pengeluaran berdasarkan kategori dan tren bulanan
 - **Laporan Keuangan**: Analisis mendalam terhadap pola pengeluaran Anda
 
 ### 💼 Manajemen Budget
+
 - **Budget Planning**: Tetapkan anggaran bulanan atau tahunan per kategori
 - **Budget Tracking**: Monitor progress dan peringatan ketika mendekati limit
 - **Budget Analytics**: Perbandingan budget vs aktual pengeluaran
 
 ### ⚙️ Personalisasi
+
 - **Multi-Currency**: Dukungan berbagai mata uang (default: IDR)
 - **Theme Options**: Mode terang dan gelap
 - **Multi-Language**: Dukungan bahasa Indonesia dan lainnya
@@ -30,7 +36,7 @@ Aplikasi manajemen keuangan personal yang membantu Anda mencatat, memantau, dan 
 - **Backend**: PostgreSQL Database
 - **Authentication**: User authentication system
 - **Database**: UUID-based schema dengan foreign key constraints
-- **Features**: 
+- **Features**:
   - Transaction management
   - Category management
   - Recurring transactions
@@ -40,6 +46,7 @@ Aplikasi manajemen keuangan personal yang membantu Anda mencatat, memantau, dan 
 ## 📋 Database Schema
 
 ### Tables Overview
+
 - `users` - Data pengguna dan autentikasi
 - `categories` - Kategori pemasukan dan pengeluaran
 - `transactions` - Record transaksi keuangan
@@ -50,36 +57,41 @@ Aplikasi manajemen keuangan personal yang membantu Anda mencatat, memantau, dan 
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - PostgreSQL 12+
 - Node.js 16+ (jika menggunakan backend Node.js)
 
 ### Installation
 
 1. **Clone repository**
+
    ```bash
    git clone https://github.com/username/trackify.git
    cd trackify
    ```
 
 2. **Setup Database**
+
    ```bash
    # Buat database baru
    createdb trackify_db
-   
+
    # Import schema
    psql trackify_db < schema.sql
    ```
 
 3. **Environment Setup**
+
    ```bash
    # Copy environment variables
    cp .env.example .env
-   
+
    # Edit konfigurasi database
    nano .env
    ```
 
 4. **Install Dependencies**
+
    ```bash
    npm install
    ```
@@ -92,6 +104,7 @@ Aplikasi manajemen keuangan personal yang membantu Anda mencatat, memantau, dan 
 ## 📱 Usage
 
 ### Input Transaksi
+
 ```
 1. Pilih jenis: Pemasukan atau Pengeluaran
 2. Masukkan jumlah dan pilih kategori
@@ -100,6 +113,7 @@ Aplikasi manajemen keuangan personal yang membantu Anda mencatat, memantau, dan 
 ```
 
 ### Manajemen Kategori
+
 ```
 1. Akses menu Kategori
 2. Tambah kategori baru dengan nama, warna, dan ikon
@@ -108,6 +122,7 @@ Aplikasi manajemen keuangan personal yang membantu Anda mencatat, memantau, dan 
 ```
 
 ### Setup Budget
+
 ```
 1. Buka menu Budget
 2. Pilih kategori dan periode (bulanan/tahunan)
@@ -118,6 +133,7 @@ Aplikasi manajemen keuangan personal yang membantu Anda mencatat, memantau, dan 
 ## 🔧 Configuration
 
 ### Database Configuration
+
 ```sql
 -- Contoh konfigurasi default categories
 INSERT INTO categories (name, type, color, icon, is_default) VALUES
@@ -127,6 +143,7 @@ INSERT INTO categories (name, type, color, icon, is_default) VALUES
 ```
 
 ### User Preferences
+
 - **Currency**: IDR (default), USD, EUR, dll
 - **Date Format**: DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD
 - **Theme**: Light/Dark mode
@@ -136,18 +153,21 @@ INSERT INTO categories (name, type, color, icon, is_default) VALUES
 ## 📊 Features Detail
 
 ### Recurring Transactions
+
 - Otomatisasi transaksi berulang
 - Frequency: daily, weekly, monthly, yearly
 - Auto-generate berdasarkan jadwal
 - Manajemen start/end date
 
 ### Budget Management
+
 - Set budget per kategori
 - Period-based budgeting (monthly/yearly)
 - Active/inactive budget tracking
 - Budget vs actual comparison
 
 ### Data Visualization
+
 - Chart pengeluaran per kategori
 - Trend analysis bulanan
 - Income vs expense comparison
