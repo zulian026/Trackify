@@ -28,6 +28,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
   Loader2,
   Search,
   Filter,
@@ -40,6 +48,8 @@ import {
   Tag,
   TrendingUp,
   TrendingDown,
+  X,
+  SlidersHorizontal,
 } from "lucide-react";
 import { Transaction, TransactionFilters, Category } from "@/types/transaction";
 import { TransactionService } from "@/lib/services/transactionService";
@@ -66,6 +76,7 @@ export default function TransactionList({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] =
     useState<Transaction | null>(null);
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
 
   const [filters, setFilters] = useState<TransactionFilters>({
     type: "all",
@@ -183,6 +194,9 @@ export default function TransactionList({
     setPage(1);
   };
 
+  const hasActiveFilters =
+    filters.search || filters.type !== "all" || filters.category_id;
+
   const totalPages = Math.ceil(totalCount / limit);
 
   if (loading && transactions.length === 0) {
@@ -191,7 +205,7 @@ export default function TransactionList({
         <div className="flex items-center justify-center py-8">
           <div className="flex items-center gap-2 text-gray-500">
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span className="text-sm sm:text-base">Memuat transaksi...</span>
+            <span className="text-sm">Memuat transaksi...</span>
           </div>
         </div>
       </div>
@@ -199,183 +213,233 @@ export default function TransactionList({
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Filter Section */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-        <div className="flex items-center gap-2 mb-4 sm:mb-6">
-          <Filter className="w-5 h-5 text-gray-600" />
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
-            Filter Transaksi
-          </h3>
+    <div className="space-y-4">
+      {/* Mobile Filter Header */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4">
+        {/* Search Bar - Always Visible */}
+        <div className="relative mb-3">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input
+            placeholder="Cari transaksi..."
+            value={filters.search || ""}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, search: e.target.value }))
+            }
+            className="pl-9 pr-4 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+          />
         </div>
-        
-        <div className="space-y-4">
-          {/* Search Input */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
-              placeholder="Cari transaksi..."
-              value={filters.search || ""}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, search: e.target.value }))
-              }
-              className="pl-9 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-            />
+
+        {/* Mobile Filter Toggle */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sheet open={filterSheetOpen} onOpenChange={setFilterSheetOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "flex items-center gap-2 border-gray-300",
+                    hasActiveFilters &&
+                      "border-blue-500 bg-blue-50 text-blue-700"
+                  )}
+                >
+                  <SlidersHorizontal className="w-4 h-4" />
+                  Filter
+                  {hasActiveFilters && (
+                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="h-[80vh]">
+                <SheetHeader className="text-left pb-4">
+                  <SheetTitle>Filter Transaksi</SheetTitle>
+                  <SheetDescription>
+                    Pilih kriteria untuk memfilter transaksi Anda
+                  </SheetDescription>
+                </SheetHeader>
+
+                <div className="space-y-4">
+                  {/* Type Filter */}
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Tipe Transaksi
+                    </label>
+                    <Select
+                      value={filters.type || "all"}
+                      onValueChange={(value) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          type: value as "income" | "expense" | "all",
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Semua Tipe</SelectItem>
+                        <SelectItem value="income">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-green-600" />
+                            Pemasukan
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="expense">
+                          <div className="flex items-center gap-2">
+                            <TrendingDown className="w-4 h-4 text-red-600" />
+                            Pengeluaran
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Category Filter */}
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Kategori
+                    </label>
+                    <Select
+                      value={filters.category_id || "all"}
+                      onValueChange={(value) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          category_id: value === "all" ? undefined : value,
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                        <SelectValue placeholder="Semua Kategori" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Semua Kategori</SelectItem>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-3 h-3 rounded-full"
+                                style={{ backgroundColor: category.color }}
+                              />
+                              {category.name}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={resetFilters}
+                      className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
+                      Reset
+                    </Button>
+                    <Button
+                      onClick={() => setFilterSheetOpen(false)}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                    >
+                      Terapkan
+                    </Button>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={resetFilters}
+                className="text-gray-500 hover:text-gray-700 p-1"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            )}
           </div>
 
-          {/* Filter Controls */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            {/* Type Filter */}
-            <div className="flex-1">
-              <Select
-                value={filters.type || "all"}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    type: value as "income" | "expense" | "all",
-                  }))
-                }
-              >
-                <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Tipe</SelectItem>
-                  <SelectItem value="income">Pemasukan</SelectItem>
-                  <SelectItem value="expense">Pengeluaran</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Category Filter */}
-            <div className="flex-1">
-              <Select
-                value={filters.category_id || "all"}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    category_id: value === "all" ? undefined : value,
-                  }))
-                }
-              >
-                <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                  <SelectValue placeholder="Semua Kategori" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Kategori</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: category.color }}
-                        />
-                        {category.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Reset Button */}
-            <Button 
-              variant="outline" 
-              onClick={resetFilters}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
-            >
-              Reset
-            </Button>
-          </div>
+          {loading && (
+            <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+          )}
         </div>
+
+        {/* Active Filters Display */}
+        {hasActiveFilters && (
+          <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-200">
+            {filters.type !== "all" && (
+              <Badge variant="secondary" className="text-xs">
+                {filters.type === "income" ? "Pemasukan" : "Pengeluaran"}
+              </Badge>
+            )}
+            {filters.category_id && (
+              <Badge variant="secondary" className="text-xs">
+                {categories.find((c) => c.id === filters.category_id)?.name}
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Transaction List */}
       <div className="bg-white rounded-xl border border-gray-200">
         {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
-              Daftar Transaksi ({totalCount})
-            </h3>
-            {loading && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
-          </div>
+        <div className="p-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">
+            Daftar Transaksi ({totalCount})
+          </h3>
         </div>
 
         {/* Content */}
-        <div className="p-4 sm:p-6">
+        <div className="p-4">
           {transactions.length === 0 ? (
-            <div className="text-center py-8 sm:py-12">
+            <div className="text-center py-12">
               <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
                 <Calendar className="w-8 h-8 text-gray-400" />
               </div>
-              <p className="text-gray-500 text-base sm:text-lg font-medium mb-2">
+              <p className="text-gray-500 text-base font-medium mb-2">
                 Tidak ada transaksi ditemukan
               </p>
-              <p className="text-gray-400 text-sm sm:text-base">
+              <p className="text-gray-400 text-sm">
                 Coba ubah filter atau tambahkan transaksi baru
               </p>
             </div>
           ) : (
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-3">
               {transactions.map((transaction) => (
                 <div
                   key={transaction.id}
-                  className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+                  className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
                 >
-                  {/* Transaction Icon */}
-                  <div
-                    className={cn(
-                      "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0",
-                      transaction.type === "income"
-                        ? "bg-green-100 text-green-600"
-                        : "bg-red-100 text-red-600"
-                    )}
-                  >
-                    {transaction.type === "income" ? (
-                      <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />
-                    ) : (
-                      <TrendingDown className="w-5 h-5 sm:w-6 sm:h-6" />
-                    )}
-                  </div>
+                  <div className="flex items-start gap-3">
+                    {/* Transaction Icon */}
+                    <div
+                      className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+                        transaction.type === "income"
+                          ? "bg-green-100 text-green-600"
+                          : "bg-red-100 text-red-600"
+                      )}
+                    >
+                      {transaction.type === "income" ? (
+                        <TrendingUp className="w-5 h-5" />
+                      ) : (
+                        <TrendingDown className="w-5 h-5" />
+                      )}
+                    </div>
 
-                  {/* Transaction Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">
-                          {transaction.description || "Tanpa deskripsi"}
-                        </p>
-                        
-                        <div className="flex items-center gap-2 mt-1">
-                          <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500">
-                            <Calendar className="w-3 h-3 flex-shrink-0" />
-                            {formatDate(transaction.transaction_date)}
-                          </div>
-                          
-                          {transaction.category && (
-                            <Badge
-                              variant="secondary"
-                              className="flex items-center gap-1 text-xs bg-gray-100 text-gray-700 hover:bg-gray-200"
-                            >
-                              <div
-                                className="w-2 h-2 rounded-full flex-shrink-0"
-                                style={{
-                                  backgroundColor: transaction.category.color,
-                                }}
-                              />
-                              <span className="truncate max-w-20 sm:max-w-none">
-                                {transaction.category.name}
-                              </span>
-                            </Badge>
-                          )}
+                    {/* Transaction Details */}
+                    <div className="flex-1 min-w-0">
+                      {/* Main Info */}
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-gray-900 text-sm leading-tight">
+                            {transaction.description || "Tanpa deskripsi"}
+                          </p>
                         </div>
-                      </div>
-
-                      {/* Amount and Actions */}
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <div className="text-right">
-                          <p className="text-sm sm:hidden font-semibold">
+                        <div className="text-right flex-shrink-0">
+                          <p className="font-bold text-sm leading-tight">
                             <span
                               className={cn(
                                 transaction.type === "income"
@@ -387,42 +451,57 @@ export default function TransactionList({
                               {formatCurrencyCompact(transaction.amount)}
                             </span>
                           </p>
-                          <p className="hidden sm:block text-base font-semibold">
-                            <span
-                              className={cn(
-                                transaction.type === "income"
-                                  ? "text-green-600"
-                                  : "text-red-600"
-                              )}
+                        </div>
+                      </div>
+
+                      {/* Meta Info */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <Calendar className="w-3 h-3" />
+                            {formatDate(transaction.transaction_date)}
+                          </div>
+
+                          {transaction.category && (
+                            <Badge
+                              variant="secondary"
+                              className="flex items-center gap-1 text-xs bg-gray-100 text-gray-700"
                             >
-                              {transaction.type === "income" ? "+" : "-"}
-                              {formatCurrency(transaction.amount)}
-                            </span>
-                          </p>
+                              <div
+                                className="w-2 h-2 rounded-full"
+                                style={{
+                                  backgroundColor: transaction.category.color,
+                                }}
+                              />
+                              <span className="truncate max-w-16">
+                                {transaction.category.name}
+                              </span>
+                            </Badge>
+                          )}
                         </div>
 
                         {/* Actions Menu */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               size="sm"
                               className="w-8 h-8 p-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
                             >
                               <MoreHorizontal className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem 
+                          <DropdownMenuContent align="end" className="w-36">
+                            <DropdownMenuItem
                               onClick={() => onEdit(transaction)}
-                              className="flex items-center gap-2 text-sm"
+                              className="flex items-center gap-2 text-sm py-2"
                             >
                               <Edit className="w-4 h-4" />
                               Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => openDeleteDialog(transaction)}
-                              className="flex items-center gap-2 text-sm text-red-600 focus:text-red-600"
+                              className="flex items-center gap-2 text-sm text-red-600 focus:text-red-600 py-2"
                             >
                               <Trash2 className="w-4 h-4" />
                               Hapus
@@ -437,12 +516,12 @@ export default function TransactionList({
             </div>
           )}
 
-          {/* Pagination */}
+          {/* Mobile Pagination */}
           {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between pt-6 border-t border-gray-200 gap-4">
-              <p className="text-sm text-gray-600 text-center sm:text-left">
-                Menampilkan {(page - 1) * limit + 1} hingga{" "}
-                {Math.min(page * limit, totalCount)} dari {totalCount} transaksi
+            <div className="pt-6 border-t border-gray-200 space-y-4">
+              <p className="text-sm text-gray-600 text-center">
+                {(page - 1) * limit + 1} - {Math.min(page * limit, totalCount)}{" "}
+                dari {totalCount}
               </p>
               <div className="flex gap-2">
                 <Button
@@ -450,10 +529,13 @@ export default function TransactionList({
                   size="sm"
                   onClick={() => setPage((prev) => Math.max(1, prev - 1))}
                   disabled={page === 1}
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                  className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   Sebelumnya
                 </Button>
+                <div className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-md border border-gray-300">
+                  {page} / {totalPages}
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
@@ -461,7 +543,7 @@ export default function TransactionList({
                     setPage((prev) => Math.min(totalPages, prev + 1))
                   }
                   disabled={page === totalPages}
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                  className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   Selanjutnya
                 </Button>
@@ -473,19 +555,19 @@ export default function TransactionList({
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-sm mx-4">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold text-gray-900">
               Hapus Transaksi
             </DialogTitle>
-            <DialogDescription className="text-gray-600">
+            <DialogDescription className="text-gray-600 text-sm">
               Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini
               tidak dapat dibatalkan.
             </DialogDescription>
           </DialogHeader>
-          
+
           {transactionToDelete && (
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center gap-3 mb-2">
                 <div
                   className={cn(
@@ -501,11 +583,11 @@ export default function TransactionList({
                     <TrendingDown className="w-4 h-4" />
                   )}
                 </div>
-                <div>
-                  <p className="font-semibold text-gray-900">
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-gray-900 text-sm">
                     {formatCurrency(transactionToDelete.amount)}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs text-gray-600 truncate">
                     {transactionToDelete.description || "Tanpa deskripsi"}
                   </p>
                 </div>
@@ -513,7 +595,7 @@ export default function TransactionList({
               {transactionToDelete.category && (
                 <Badge
                   variant="secondary"
-                  className="flex items-center gap-1 w-fit bg-gray-100 text-gray-700"
+                  className="flex items-center gap-1 w-fit bg-gray-100 text-gray-700 text-xs"
                 >
                   <div
                     className="w-2 h-2 rounded-full"
@@ -526,13 +608,13 @@ export default function TransactionList({
               )}
             </div>
           )}
-          
-          <DialogFooter className="gap-2 sm:gap-0">
+
+          <DialogFooter className="flex-col gap-2 sm:flex-row sm:gap-0">
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
               disabled={deleting === transactionToDelete?.id}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-gray-50"
             >
               Batal
             </Button>
@@ -540,7 +622,7 @@ export default function TransactionList({
               variant="destructive"
               onClick={handleDelete}
               disabled={deleting === transactionToDelete?.id}
-              className="bg-red-600 hover:bg-red-700"
+              className="w-full sm:w-auto bg-red-600 hover:bg-red-700"
             >
               {deleting === transactionToDelete?.id && (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
