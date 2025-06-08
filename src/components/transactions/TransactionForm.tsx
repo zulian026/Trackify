@@ -23,6 +23,11 @@ import {
   X,
   Divide,
   Equal,
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  Tag,
+  DollarSign,
 } from "lucide-react";
 import {
   Transaction,
@@ -32,6 +37,7 @@ import {
 import { TransactionService } from "@/lib/services/transactionService";
 import { CategoryService } from "@/lib/services/categoryService";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface TransactionFormProps {
   userId: string;
@@ -181,12 +187,12 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
     className?: string;
   }> = ({ onClick, children, variant = "default", className = "" }) => {
     const baseClass =
-      "h-10 text-sm font-semibold transition-all duration-150 hover:scale-105";
+      "h-10 text-sm font-semibold transition-all duration-150 hover:scale-105 border border-gray-300";
     const variants = {
-      default: "bg-gray-100 hover:bg-gray-200 text-gray-800",
-      operation: "bg-blue-500 hover:bg-blue-600 text-white",
-      equals: "bg-green-500 hover:bg-green-600 text-white",
-      secondary: "bg-gray-200 hover:bg-gray-300 text-gray-700",
+      default: "bg-white hover:bg-gray-50 text-gray-900",
+      operation: "bg-blue-600 hover:bg-blue-700 text-white border-blue-600",
+      equals: "bg-green-600 hover:bg-green-700 text-white border-green-600",
+      secondary: "bg-gray-100 hover:bg-gray-200 text-gray-700",
     };
 
     return (
@@ -203,27 +209,30 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
   };
 
   return (
-    <div className="space-y-2">
-      <Label>{label} *</Label>
+    <div className="space-y-3">
+      <Label className="text-sm font-medium text-gray-900">{label} *</Label>
 
       {/* Input dengan tombol kalkulator */}
       <div className="flex gap-2">
-        <Input
-          type="number"
-          step="0.01"
-          min="0.01"
-          value={inputValue}
-          onChange={(e) => handleInputChange(e.target.value)}
-          placeholder="0.00"
-          className="flex-1"
-          required
-        />
+        <div className="relative flex-1">
+          <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input
+            type="number"
+            step="0.01"
+            min="0.01"
+            value={inputValue}
+            onChange={(e) => handleInputChange(e.target.value)}
+            placeholder="0.00"
+            className="pl-9 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+            required
+          />
+        </div>
         <Button
           type="button"
           variant="outline"
           size="icon"
           onClick={() => setShowCalculator(!showCalculator)}
-          className="shrink-0"
+          className="shrink-0 border-gray-300 text-gray-700 hover:bg-gray-50"
         >
           <Calculator className="h-4 w-4" />
         </Button>
@@ -231,42 +240,45 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
 
       {/* Preview mata uang */}
       {parseFloat(inputValue) > 0 && (
-        <Badge variant="outline" className="text-sm">
+        <Badge
+          variant="secondary"
+          className="text-sm bg-gray-100 text-gray-700"
+        >
           {formatCurrency(inputValue)}
         </Badge>
       )}
 
       {/* Kalkulator */}
       {showCalculator && (
-        <Card className="w-full">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center justify-between">
+        <Card className="w-full border-gray-200">
+          <CardHeader className="pb-3 border-b border-gray-200">
+            <CardTitle className="text-base flex items-center justify-between text-gray-900">
               <span>Kalkulator</span>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowCalculator(false)}
-                className="h-6 w-6 p-0"
+                className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
               >
-                ×
+                <X className="h-4 w-4" />
               </Button>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4 p-4">
             {/* Display */}
-            <div className="bg-gray-50 p-3 rounded-lg text-right">
+            <div className="bg-gray-50 p-4 rounded-lg text-right border border-gray-200">
               <div className="text-xs text-gray-500 h-4">
                 {previousValue && operation && `${previousValue} ${operation}`}
               </div>
-              <div className="text-xl font-bold text-gray-800">{display}</div>
+              <div className="text-xl font-bold text-gray-900">{display}</div>
               <div className="text-xs text-green-600 mt-1">
                 {formatCurrency(display)}
               </div>
             </div>
 
             {/* Tombol-tombol */}
-            <div className="grid grid-cols-4 gap-1.5">
+            <div className="grid grid-cols-4 gap-2">
               {/* Baris 1 */}
               <CalculatorButton
                 onClick={clear}
@@ -353,7 +365,7 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
             <Button
               type="button"
               onClick={handleUseValue}
-              className="w-full bg-green-500 hover:bg-green-600 text-white"
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
               size="sm"
             >
               Gunakan: {formatCurrency(display)}
@@ -478,152 +490,187 @@ export default function TransactionForm({
   );
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          {transaction ? "Edit Transaksi" : "Tambah Transaksi Baru"}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Jenis Transaksi */}
-          <div className="space-y-2">
-            <Label>Jenis Transaksi</Label>
-            <div className="flex gap-2">
+    <div className="w-full max-w-lg mx-auto">
+      <Card className="border-gray-200">
+        <CardHeader className="border-b border-gray-200">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-semibold text-gray-900">
+            {formData.type === "income" ? (
+              <TrendingUp className="w-5 h-5 text-green-600" />
+            ) : (
+              <TrendingDown className="w-5 h-5 text-red-600" />
+            )}
+            {transaction ? "Edit Transaksi" : "Tambah Transaksi Baru"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4 sm:p-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Jenis Transaksi */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-gray-900">
+                Jenis Transaksi
+              </Label>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={formData.type === "income" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleTypeChange("income")}
+                  className={cn(
+                    "flex items-center gap-2 flex-1 transition-all duration-200",
+                    formData.type === "income"
+                      ? "bg-green-600 hover:bg-green-700 text-white border-green-600"
+                      : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                  )}
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  Pemasukan
+                </Button>
+                <Button
+                  type="button"
+                  variant={formData.type === "expense" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleTypeChange("expense")}
+                  className={cn(
+                    "flex items-center gap-2 flex-1 transition-all duration-200",
+                    formData.type === "expense"
+                      ? "bg-red-600 hover:bg-red-700 text-white border-red-600"
+                      : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                  )}
+                >
+                  <TrendingDown className="w-4 h-4" />
+                  Pengeluaran
+                </Button>
+              </div>
+            </div>
+
+            {/* Nominal dengan Kalkulator */}
+            <CalculatorInput
+              value={formData.amount}
+              onChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  amount: value,
+                }))
+              }
+              label="Nominal"
+            />
+
+            {/* Kategori */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                <Tag className="w-4 h-4" />
+                Kategori *
+              </Label>
+              {loadingCategories ? (
+                <div className="flex items-center gap-2 text-sm text-gray-500 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Memuat kategori...
+                </div>
+              ) : (
+                <Select
+                  value={formData.category_id}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, category_id: value }))
+                  }
+                  required
+                >
+                  <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                    <SelectValue placeholder="Pilih kategori" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredCategories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: category.color }}
+                          />
+                          {category.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+
+              {filteredCategories.length === 0 && !loadingCategories && (
+                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm text-yellow-800">
+                    Tidak ada kategori{" "}
+                    {formData.type === "income" ? "pemasukan" : "pengeluaran"}.
+                    Silakan buat terlebih dahulu.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Tanggal */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Tanggal *
+              </Label>
+              <Input
+                type="date"
+                value={formData.transaction_date}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    transaction_date: e.target.value,
+                  }))
+                }
+                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            {/* Deskripsi */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-gray-900">
+                Deskripsi
+              </Label>
+              <Textarea
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+                placeholder="Deskripsi opsional..."
+                rows={3}
+                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+              />
+            </div>
+
+            {/* Tombol Aksi */}
+            <div className="flex gap-3 pt-4">
               <Button
                 type="button"
-                variant={formData.type === "income" ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleTypeChange("income")}
-                className="flex items-center gap-1"
+                variant="outline"
+                onClick={onCancel}
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
+                disabled={loading}
               >
-                <Plus className="w-4 h-4" />
-                Pemasukan
+                Batal
               </Button>
               <Button
-                type="button"
-                variant={formData.type === "expense" ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleTypeChange("expense")}
-                className="flex items-center gap-1"
+                type="submit"
+                className={cn(
+                  "flex-1 text-white transition-all duration-200",
+                  formData.type === "income"
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-red-600 hover:bg-red-700"
+                )}
+                disabled={loading || filteredCategories.length === 0}
               >
-                <Minus className="w-4 h-4" />
-                Pengeluaran
+                {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {transaction ? "Perbarui" : "Buat"}
               </Button>
             </div>
-          </div>
-
-          {/* Nominal dengan Kalkulator */}
-          <CalculatorInput
-            value={formData.amount}
-            onChange={(value) =>
-              setFormData((prev) => ({
-                ...prev,
-                amount: value,
-              }))
-            }
-            label="Nominal"
-          />
-
-          {/* Kategori */}
-          <div className="space-y-2">
-            <Label htmlFor="category">Kategori *</Label>
-            {loadingCategories ? (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Memuat kategori...
-              </div>
-            ) : (
-              <Select
-                value={formData.category_id}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, category_id: value }))
-                }
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih kategori" />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredCategories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: category.color }}
-                        />
-                        {category.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-
-            {filteredCategories.length === 0 && !loadingCategories && (
-              <p className="text-sm text-muted-foreground">
-                Tidak ada kategori {formData.type}. Silakan buat terlebih
-                dahulu.
-              </p>
-            )}
-          </div>
-
-          {/* Tanggal */}
-          <div className="space-y-2">
-            <Label htmlFor="date">Tanggal *</Label>
-            <Input
-              id="date"
-              type="date"
-              value={formData.transaction_date}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  transaction_date: e.target.value,
-                }))
-              }
-              required
-            />
-          </div>
-
-          {/* Deskripsi */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-              placeholder="Deskripsi opsional..."
-              rows={3}
-            />
-          </div>
-
-          {/* Tombol Aksi */}
-          <div className="flex gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              className="flex-1"
-              disabled={loading}
-            >
-              Batal
-            </Button>
-            <Button
-              type="submit"
-              className="flex-1"
-              disabled={loading || filteredCategories.length === 0}
-            >
-              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              {transaction ? "Perbarui" : "Buat"}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

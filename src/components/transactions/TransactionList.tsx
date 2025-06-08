@@ -38,6 +38,8 @@ import {
   Minus,
   Calendar,
   Tag,
+  TrendingUp,
+  TrendingDown,
 } from "lucide-react";
 import { Transaction, TransactionFilters, Category } from "@/types/transaction";
 import { TransactionService } from "@/lib/services/transactionService";
@@ -154,6 +156,17 @@ export default function TransactionList({
     }).format(amount);
   };
 
+  const formatCurrencyCompact = (amount: number) => {
+    if (amount >= 1000000000) {
+      return `${(amount / 1000000000).toFixed(1)}M`;
+    } else if (amount >= 1000000) {
+      return `${(amount / 1000000).toFixed(1)}Jt`;
+    } else if (amount >= 1000) {
+      return `${(amount / 1000).toFixed(0)}rb`;
+    }
+    return formatCurrency(amount);
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("id-ID", {
       day: "numeric",
@@ -174,214 +187,260 @@ export default function TransactionList({
 
   if (loading && transactions.length === 0) {
     return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-8">
-          <div className="flex items-center gap-2 text-muted-foreground">
+      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+        <div className="flex items-center justify-center py-8">
+          <div className="flex items-center gap-2 text-gray-500">
             <Loader2 className="w-4 h-4 animate-spin" />
-            Memuat transaksi...
+            <span className="text-sm sm:text-base">Memuat transaksi...</span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {/* Filter */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="w-5 h-5" />
+    <div className="space-y-4 sm:space-y-6">
+      {/* Filter Section */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+        <div className="flex items-center gap-2 mb-4 sm:mb-6">
+          <Filter className="w-5 h-5 text-gray-600" />
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
             Filter Transaksi
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-            {/* Pencarian */}
+          </h3>
+        </div>
+        
+        <div className="space-y-4">
+          {/* Search Input */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Cari transaksi..."
+              value={filters.search || ""}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, search: e.target.value }))
+              }
+              className="pl-9 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Filter Controls */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            {/* Type Filter */}
             <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Cari transaksi..."
-                  value={filters.search || ""}
-                  onChange={(e) =>
-                    setFilters((prev) => ({ ...prev, search: e.target.value }))
-                  }
-                  className="pl-9"
-                />
-              </div>
+              <Select
+                value={filters.type || "all"}
+                onValueChange={(value) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    type: value as "income" | "expense" | "all",
+                  }))
+                }
+              >
+                <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Tipe</SelectItem>
+                  <SelectItem value="income">Pemasukan</SelectItem>
+                  <SelectItem value="expense">Pengeluaran</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Filter Tipe */}
-            <Select
-              value={filters.type || "all"}
-              onValueChange={(value) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  type: value as "income" | "expense" | "all",
-                }))
-              }
-            >
-              <SelectTrigger className="w-[140px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Tipe</SelectItem>
-                <SelectItem value="income">Pemasukan</SelectItem>
-                <SelectItem value="expense">Pengeluaran</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Category Filter */}
+            <div className="flex-1">
+              <Select
+                value={filters.category_id || "all"}
+                onValueChange={(value) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    category_id: value === "all" ? undefined : value,
+                  }))
+                }
+              >
+                <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                  <SelectValue placeholder="Semua Kategori" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Kategori</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: category.color }}
+                        />
+                        {category.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            {/* Filter Kategori */}
-            <Select
-              value={filters.category_id || "all"}
-              onValueChange={(value) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  category_id: value === "all" ? undefined : value,
-                }))
-              }
+            {/* Reset Button */}
+            <Button 
+              variant="outline" 
+              onClick={resetFilters}
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
             >
-              <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Semua Kategori" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Kategori</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: category.color }}
-                      />
-                      {category.name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Reset Filter */}
-            <Button variant="outline" onClick={resetFilters}>
               Reset
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Daftar Transaksi */}
-      <Card>
-        <CardHeader>
+      {/* Transaction List */}
+      <div className="bg-white rounded-xl border border-gray-200">
+        {/* Header */}
+        <div className="p-4 sm:p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <CardTitle>Transaksi ({totalCount})</CardTitle>
-            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+              Daftar Transaksi ({totalCount})
+            </h3>
+            {loading && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
           </div>
-        </CardHeader>
-        <CardContent>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 sm:p-6">
           {transactions.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>Tidak ada transaksi ditemukan</p>
-              <p className="text-sm">
+            <div className="text-center py-8 sm:py-12">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                <Calendar className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500 text-base sm:text-lg font-medium mb-2">
+                Tidak ada transaksi ditemukan
+              </p>
+              <p className="text-gray-400 text-sm sm:text-base">
                 Coba ubah filter atau tambahkan transaksi baru
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3 sm:space-y-4">
               {transactions.map((transaction) => (
                 <div
                   key={transaction.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                  className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
                 >
-                  <div className="flex items-center gap-3 flex-1">
-                    {/* Ikon Tipe */}
-                    <div
-                      className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center",
-                        transaction.type === "income"
-                          ? "bg-green-100 text-green-600"
-                          : "bg-red-100 text-red-600"
-                      )}
-                    >
-                      {transaction.type === "income" ? (
-                        <Plus className="w-4 h-4" />
-                      ) : (
-                        <Minus className="w-4 h-4" />
-                      )}
-                    </div>
+                  {/* Transaction Icon */}
+                  <div
+                    className={cn(
+                      "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0",
+                      transaction.type === "income"
+                        ? "bg-green-100 text-green-600"
+                        : "bg-red-100 text-red-600"
+                    )}
+                  >
+                    {transaction.type === "income" ? (
+                      <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />
+                    ) : (
+                      <TrendingDown className="w-5 h-5 sm:w-6 sm:h-6" />
+                    )}
+                  </div>
 
-                    {/* Info Transaksi */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium truncate">
+                  {/* Transaction Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">
                           {transaction.description || "Tanpa deskripsi"}
-                        </span>
-                        {transaction.category && (
-                          <Badge
-                            variant="secondary"
-                            className="flex items-center gap-1"
-                          >
-                            <div
-                              className="w-2 h-2 rounded-full"
-                              style={{
-                                backgroundColor: transaction.category.color,
-                              }}
-                            />
-                            {transaction.category.name}
-                          </Badge>
-                        )}
+                        </p>
+                        
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500">
+                            <Calendar className="w-3 h-3 flex-shrink-0" />
+                            {formatDate(transaction.transaction_date)}
+                          </div>
+                          
+                          {transaction.category && (
+                            <Badge
+                              variant="secondary"
+                              className="flex items-center gap-1 text-xs bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            >
+                              <div
+                                className="w-2 h-2 rounded-full flex-shrink-0"
+                                style={{
+                                  backgroundColor: transaction.category.color,
+                                }}
+                              />
+                              <span className="truncate max-w-20 sm:max-w-none">
+                                {transaction.category.name}
+                              </span>
+                            </Badge>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="w-3 h-3" />
-                        {formatDate(transaction.transaction_date)}
+
+                      {/* Amount and Actions */}
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="text-right">
+                          <p className="text-sm sm:hidden font-semibold">
+                            <span
+                              className={cn(
+                                transaction.type === "income"
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              )}
+                            >
+                              {transaction.type === "income" ? "+" : "-"}
+                              {formatCurrencyCompact(transaction.amount)}
+                            </span>
+                          </p>
+                          <p className="hidden sm:block text-base font-semibold">
+                            <span
+                              className={cn(
+                                transaction.type === "income"
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              )}
+                            >
+                              {transaction.type === "income" ? "+" : "-"}
+                              {formatCurrency(transaction.amount)}
+                            </span>
+                          </p>
+                        </div>
+
+                        {/* Actions Menu */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="w-8 h-8 p-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                            >
+                              <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuItem 
+                              onClick={() => onEdit(transaction)}
+                              className="flex items-center gap-2 text-sm"
+                            >
+                              <Edit className="w-4 h-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => openDeleteDialog(transaction)}
+                              className="flex items-center gap-2 text-sm text-red-600 focus:text-red-600"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
-
-                    {/* Jumlah */}
-                    <div className="text-right">
-                      <p
-                        className={cn(
-                          "font-semibold",
-                          transaction.type === "income"
-                            ? "text-green-600"
-                            : "text-red-600"
-                        )}
-                      >
-                        {transaction.type === "income" ? "+" : "-"}
-                        {formatCurrency(transaction.amount)}
-                      </p>
-                    </div>
-
-                    {/* Aksi */}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(transaction)}>
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => openDeleteDialog(transaction)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Hapus
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </div>
                 </div>
               ))}
             </div>
           )}
 
-          {/* Navigasi Halaman */}
+          {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-4 border-t">
-              <p className="text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row items-center justify-between pt-6 border-t border-gray-200 gap-4">
+              <p className="text-sm text-gray-600 text-center sm:text-left">
                 Menampilkan {(page - 1) * limit + 1} hingga{" "}
                 {Math.min(page * limit, totalCount)} dari {totalCount} transaksi
               </p>
@@ -391,6 +450,7 @@ export default function TransactionList({
                   size="sm"
                   onClick={() => setPage((prev) => Math.max(1, prev - 1))}
                   disabled={page === 1}
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   Sebelumnya
                 </Button>
@@ -401,51 +461,78 @@ export default function TransactionList({
                     setPage((prev) => Math.min(totalPages, prev + 1))
                   }
                   disabled={page === totalPages}
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   Selanjutnya
                 </Button>
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Dialog Konfirmasi Hapus */}
+      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Hapus Transaksi</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg font-semibold text-gray-900">
+              Hapus Transaksi
+            </DialogTitle>
+            <DialogDescription className="text-gray-600">
               Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini
               tidak dapat dibatalkan.
             </DialogDescription>
           </DialogHeader>
+          
           {transactionToDelete && (
-            <div className="p-4 bg-muted rounded-lg">
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant={
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex items-center gap-3 mb-2">
+                <div
+                  className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center",
                     transactionToDelete.type === "income"
-                      ? "default"
-                      : "destructive"
-                  }
+                      ? "bg-green-100 text-green-600"
+                      : "bg-red-100 text-red-600"
+                  )}
                 >
-                  {transactionToDelete.type}
-                </Badge>
-                <span className="font-medium">
-                  {formatCurrency(transactionToDelete.amount)}
-                </span>
+                  {transactionToDelete.type === "income" ? (
+                    <TrendingUp className="w-4 h-4" />
+                  ) : (
+                    <TrendingDown className="w-4 h-4" />
+                  )}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">
+                    {formatCurrency(transactionToDelete.amount)}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {transactionToDelete.description || "Tanpa deskripsi"}
+                  </p>
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                {transactionToDelete.description || "Tanpa deskripsi"}
-              </p>
+              {transactionToDelete.category && (
+                <Badge
+                  variant="secondary"
+                  className="flex items-center gap-1 w-fit bg-gray-100 text-gray-700"
+                >
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{
+                      backgroundColor: transactionToDelete.category.color,
+                    }}
+                  />
+                  {transactionToDelete.category.name}
+                </Badge>
+              )}
             </div>
           )}
-          <DialogFooter>
+          
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
               disabled={deleting === transactionToDelete?.id}
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
             >
               Batal
             </Button>
@@ -453,6 +540,7 @@ export default function TransactionList({
               variant="destructive"
               onClick={handleDelete}
               disabled={deleting === transactionToDelete?.id}
+              className="bg-red-600 hover:bg-red-700"
             >
               {deleting === transactionToDelete?.id && (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
