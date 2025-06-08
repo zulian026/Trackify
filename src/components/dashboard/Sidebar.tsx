@@ -93,6 +93,26 @@ const menuItems = [
     ),
   },
   {
+    name: "Transaksi Berulang",
+    href: "/dashboard/recurring",
+    icon: (
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 4v6h6M20 20v-6h-6M4 20l16-16"
+        />
+      </svg>
+    ),
+  },
+
+  {
     name: "Laporan",
     href: "/dashboard/reports",
     icon: (
