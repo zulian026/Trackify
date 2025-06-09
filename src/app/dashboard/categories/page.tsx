@@ -1,643 +1,503 @@
-// app/dashboard/categories/page.tsx
-"use client";
+  // app/dashboard/categories/page.tsx
+  "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Plus,
-  Edit2,
-  Trash2,
-  TrendingUp,
-  TrendingDown,
-  Palette,
-  Grid3X3,
-  Banknote,
-  Laptop,
-  Gift,
-  Utensils,
-  Car,
-  ShoppingBag,
-  Gamepad2,
-  Receipt,
-  HeartPulse,
-  GraduationCap,
-  MoreHorizontal,
-  Home,
-  Plane,
-  Coffee,
-  Smartphone,
-  Book,
-  Music,
-  Camera,
-  Dumbbell,
-  Briefcase,
-  Stethoscope,
-} from "lucide-react";
-import { Category } from "@/types/transaction";
-import { CategoryService } from "@/lib/services/categoryService";
-import { useToast } from "@/hooks/use-toast";
-import { useUser } from "@/hooks/use-user";
+  import { useState, useEffect } from "react";
+  import { Button } from "@/components/ui/button";
+  import { Badge } from "@/components/ui/badge";
+  import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+  } from "@/components/ui/alert-dialog";
+  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+  import {
+    Plus,
+    Edit2,
+    Trash2,
+    TrendingUp,
+    TrendingDown,
+    Grid3X3,
+    MoreHorizontal,
+    Wallet,
+    Banknote,
+    Laptop,
+    Gift,
+    Utensils,
+    Car,
+    ShoppingBag,
+    Gamepad2,
+    Receipt,
+    HeartPulse,
+    GraduationCap,
+    Home,
+    Plane,
+    Coffee,
+    Smartphone,
+    Book,
+    Music,
+    Camera,
+    Dumbbell,
+    Briefcase,
+    Stethoscope,
+  } from "lucide-react";
+  import { Category } from "@/types/transaction";
+  import { CategoryService } from "@/lib/services/categoryService";
+  import { useToast } from "@/hooks/use-toast";
+  import { useUser } from "@/hooks/use-user";
+  import { CategoryForm } from "@/components/category/CategoryForm";
 
-// Available icons for categories
-const AVAILABLE_ICONS = [
-  { name: "banknote", icon: Banknote },
-  { name: "laptop", icon: Laptop },
-  { name: "trending-up", icon: TrendingUp },
-  { name: "gift", icon: Gift },
-  { name: "utensils", icon: Utensils },
-  { name: "car", icon: Car },
-  { name: "shopping-bag", icon: ShoppingBag },
-  { name: "gamepad-2", icon: Gamepad2 },
-  { name: "receipt", icon: Receipt },
-  { name: "heart-pulse", icon: HeartPulse },
-  { name: "graduation-cap", icon: GraduationCap },
-  { name: "more-horizontal", icon: MoreHorizontal },
-  { name: "home", icon: Home },
-  { name: "plane", icon: Plane },
-  { name: "coffee", icon: Coffee },
-  { name: "smartphone", icon: Smartphone },
-  { name: "book", icon: Book },
-  { name: "music", icon: Music },
-  { name: "camera", icon: Camera },
-  { name: "dumbbell", icon: Dumbbell },
-  { name: "briefcase", icon: Briefcase },
-  { name: "stethoscope", icon: Stethoscope },
-];
+  // Available icons for categories
+  const AVAILABLE_ICONS = [
+    { name: "banknote", icon: Banknote },
+    { name: "laptop", icon: Laptop },
+    { name: "gift", icon: Gift },
+    { name: "utensils", icon: Utensils },
+    { name: "car", icon: Car },
+    { name: "shopping-bag", icon: ShoppingBag },
+    { name: "gamepad-2", icon: Gamepad2 },
+    { name: "receipt", icon: Receipt },
+    { name: "heart-pulse", icon: HeartPulse },
+    { name: "graduation-cap", icon: GraduationCap },
+    { name: "more-horizontal", icon: MoreHorizontal },
+    { name: "home", icon: Home },
+    { name: "plane", icon: Plane },
+    { name: "coffee", icon: Coffee },
+    { name: "smartphone", icon: Smartphone },
+    { name: "book", icon: Book },
+    { name: "music", icon: Music },
+    { name: "camera", icon: Camera },
+    { name: "dumbbell", icon: Dumbbell },
+    { name: "briefcase", icon: Briefcase },
+    { name: "stethoscope", icon: Stethoscope },
+  ];
 
-// Available colors for categories
-const AVAILABLE_COLORS = [
-  "#EF4444", // Red
-  "#F97316", // Orange
-  "#F59E0B", // Amber
-  "#EAB308", // Yellow
-  "#84CC16", // Lime
-  "#22C55E", // Green
-  "#10B981", // Emerald
-  "#14B8A6", // Teal
-  "#06B6D4", // Cyan
-  "#0EA5E9", // Sky
-  "#3B82F6", // Blue
-  "#6366F1", // Indigo
-  "#8B5CF6", // Violet
-  "#A855F7", // Purple
-  "#D946EF", // Fuchsia
-  "#EC4899", // Pink
-  "#F43F5E", // Rose
-  "#6B7280", // Gray
-];
+  interface CategoryFormData {
+    name: string;
+    type: "income" | "expense";
+    color: string;
+    icon: string;
+    is_default?: boolean;
+  }
 
-interface CategoryFormData {
-  name: string;
-  type: "income" | "expense";
-  color: string;
-  icon: string;
-  is_default?: boolean; // Add this optional property
-}
+  export default function CategoriesPage() {
+    const { user } = useUser();
+    const { toast } = useToast();
 
-export default function CategoriesPage() {
-  const { user } = useUser();
-  const { toast } = useToast();
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [showForm, setShowForm] = useState(false);
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+    const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
-  const [formData, setFormData] = useState<CategoryFormData>({
-    name: "",
-    type: "expense",
-    color: "#EF4444",
-    icon: "more-horizontal",
-    is_default: false, // Initialize with default value
-  });
+    useEffect(() => {
+      if (user?.id) {
+        loadCategories();
+      }
+    }, [user?.id]);
 
-  useEffect(() => {
-    if (user?.id) {
-      loadCategories();
-    }
-  }, [user?.id]);
+    const loadCategories = async () => {
+      if (!user?.id) return;
 
-  const loadCategories = async () => {
-    if (!user?.id) return;
-
-    try {
-      setLoading(true);
-      const data = await CategoryService.getCategories(user.id);
-      setCategories(data);
-    } catch (error) {
-      toast({
-        title: "Gagal",
-        description: "Gagal memuat kategori",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user?.id) return;
-
-    try {
-      if (editingCategory) {
-        // For updates, we need to exclude is_default from the update data
-        // since it shouldn't be changed for existing categories
-        const { is_default, ...updateData } = formData;
-        await CategoryService.updateCategory(
-          user.id,
-          editingCategory.id,
-          updateData
-        );
+      try {
+        setLoading(true);
+        const data = await CategoryService.getCategories(user.id);
+        setCategories(data);
+      } catch (error) {
         toast({
-          title: "Berhasil",
-          description: "Kategori berhasil diperbarui",
+          title: "Gagal",
+          description: "Gagal memuat kategori",
+          variant: "destructive",
         });
-      } else {
-        // For new categories, ensure is_default is set to false
-        const categoryData = {
-          ...formData,
-          is_default: false,
-        };
-        await CategoryService.createCategory(user.id, categoryData);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const handleFormSubmit = async (formData: CategoryFormData) => {
+      if (!user?.id) return;
+
+      try {
+        if (editingCategory) {
+          const { is_default, ...updateData } = formData;
+          await CategoryService.updateCategory(
+            user.id,
+            editingCategory.id,
+            updateData
+          );
+          toast({
+            title: "Berhasil",
+            description: "Kategori berhasil diperbarui",
+          });
+        } else {
+          const categoryData = {
+            ...formData,
+            is_default: false,
+          };
+          await CategoryService.createCategory(user.id, categoryData);
+          toast({
+            title: "Berhasil",
+            description: "Kategori berhasil ditambahkan",
+          });
+        }
+
+        setShowForm(false);
+        setEditingCategory(null);
+        loadCategories();
+      } catch (error: any) {
+        toast({
+          title: "Gagal",
+          description: error.message || "Gagal menyimpan kategori",
+          variant: "destructive",
+        });
+        throw error; // Re-throw to handle in form component
+      }
+    };
+
+    const handleDelete = async () => {
+      if (!user?.id || !deleteCategory) return;
+
+      try {
+        await CategoryService.deleteCategory(user.id, deleteCategory.id);
         toast({
           title: "Berhasil",
-          description: "Kategori berhasil ditambahkan",
+          description: "Kategori berhasil dihapus",
+        });
+        setDeleteCategory(null);
+        loadCategories();
+      } catch (error: any) {
+        toast({
+          title: "Gagal",
+          description: error.message || "Gagal menghapus kategori",
+          variant: "destructive",
         });
       }
+    };
 
-      handleCloseForm();
-      loadCategories();
-    } catch (error: any) {
-      toast({
-        title: "Gagal",
-        description: error.message || "Gagal menyimpan kategori",
-        variant: "destructive",
-      });
-    }
-  };
+    const handleEdit = (category: Category) => {
+      setEditingCategory(category);
+      setShowForm(true);
+    };
 
-  const handleDelete = async () => {
-    if (!user?.id || !deleteCategory) return;
+    const handleFormCancel = () => {
+      setShowForm(false);
+      setEditingCategory(null);
+    };
 
-    try {
-      await CategoryService.deleteCategory(user.id, deleteCategory.id);
-      toast({
-        title: "Berhasil",
-        description: "Kategori berhasil dihapus",
-      });
-      setDeleteCategory(null);
-      loadCategories();
-    } catch (error: any) {
-      toast({
-        title: "Gagal",
-        description: error.message || "Gagal menghapus kategori",
-        variant: "destructive",
-      });
-    }
-  };
+    const getIconComponent = (iconName: string) => {
+      const iconData = AVAILABLE_ICONS.find((i) => i.name === iconName);
+      return iconData ? iconData.icon : MoreHorizontal;
+    };
 
-  const handleEdit = (category: Category) => {
-    setEditingCategory(category);
-    setFormData({
-      name: category.name,
-      type: category.type,
-      color: category.color,
-      icon: category.icon,
-      is_default: category.is_default,
-    });
-    setShowForm(true);
-  };
+    const incomeCategories = categories.filter((cat) => cat.type === "income");
+    const expenseCategories = categories.filter((cat) => cat.type === "expense");
 
-  const handleCloseForm = () => {
-    setShowForm(false);
-    setEditingCategory(null);
-    setFormData({
-      name: "",
-      type: "expense",
-      color: "#EF4444",
-      icon: "more-horizontal",
-      is_default: false,
-    });
-  };
+    const SummaryCard = ({
+      title,
+      amount,
+      icon: Icon,
+      color = "blue",
+      subtitle,
+      isLoading = false,
+    }: {
+      title: string;
+      amount: number;
+      icon: any;
+      color?: "blue" | "green" | "red" | "purple";
+      subtitle?: string;
+      isLoading?: boolean;
+    }) => {
+      const colorClasses = {
+        blue: "bg-blue-50 border-blue-200 text-blue-700",
+        green: "bg-green-50 border-green-200 text-green-700",
+        red: "bg-red-50 border-red-200 text-red-700",
+        purple: "bg-purple-50 border-purple-200 text-purple-700",
+      };
 
-  const getIconComponent = (iconName: string) => {
-    const iconData = AVAILABLE_ICONS.find((i) => i.name === iconName);
-    return iconData ? iconData.icon : MoreHorizontal;
-  };
+      const iconColors = {
+        blue: "text-blue-600",
+        green: "text-green-600",
+        red: "text-red-600",
+        purple: "text-purple-600",
+      };
 
-  const incomeCategories = categories.filter((cat) => cat.type === "income");
-  const expenseCategories = categories.filter((cat) => cat.type === "expense");
-
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Silakan masuk untuk mengakses kategori</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Kategori</h1>
-          <p className="text-muted-foreground">
-            Kelola kategori pemasukan dan pengeluaran Anda
-          </p>
-        </div>
-        <Button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-2"
+      return (
+        <div
+          className={`p-4 sm:p-6 rounded-xl border-2 ${colorClasses[color]} transition-all hover:shadow-lg`}
         >
-          <Plus className="w-4 h-4" />
-          Tambah Kategori
-        </Button>
-      </div>
-
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Kategori
-            </CardTitle>
-            <Grid3X3 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{categories.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Semua kategori aktif
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Kategori Pemasukan
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {incomeCategories.length}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Kategori pemasukan aktif
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Kategori Pengeluaran
-            </CardTitle>
-            <TrendingDown className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {expenseCategories.length}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Kategori pengeluaran aktif
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Categories Tabs */}
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="all">Semua Kategori</TabsTrigger>
-          <TabsTrigger value="income">Pemasukan</TabsTrigger>
-          <TabsTrigger value="expense">Pengeluaran</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all" className="space-y-4">
-          <CategoryGrid
-            categories={categories}
-            loading={loading}
-            onEdit={handleEdit}
-            onDelete={setDeleteCategory}
-            getIconComponent={getIconComponent}
-          />
-        </TabsContent>
-
-        <TabsContent value="income" className="space-y-4">
-          <CategoryGrid
-            categories={incomeCategories}
-            loading={loading}
-            onEdit={handleEdit}
-            onDelete={setDeleteCategory}
-            getIconComponent={getIconComponent}
-          />
-        </TabsContent>
-
-        <TabsContent value="expense" className="space-y-4">
-          <CategoryGrid
-            categories={expenseCategories}
-            loading={loading}
-            onEdit={handleEdit}
-            onDelete={setDeleteCategory}
-            getIconComponent={getIconComponent}
-          />
-        </TabsContent>
-      </Tabs>
-
-      {/* Category Form Dialog */}
-      <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {editingCategory ? "Edit Kategori" : "Tambah Kategori Baru"}
-            </DialogTitle>
-          </DialogHeader>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Category Name */}
-            <div className="space-y-2">
-              <Label htmlFor="name">Nama Kategori</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, name: e.target.value }))
-                }
-                placeholder="Masukkan nama kategori"
-                required
-              />
-            </div>
-
-            {/* Category Type */}
-            <div className="space-y-2">
-              <Label>Jenis Kategori</Label>
-              <Select
-                value={formData.type}
-                onValueChange={(value: "income" | "expense") =>
-                  setFormData((prev) => ({ ...prev, type: value }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="income">
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-green-600" />
-                      Pemasukan
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="expense">
-                    <div className="flex items-center gap-2">
-                      <TrendingDown className="w-4 h-4 text-red-600" />
-                      Pengeluaran
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Color Picker */}
-            <div className="space-y-2">
-              <Label>Warna Kategori</Label>
-              <div className="grid grid-cols-6 gap-2">
-                {AVAILABLE_COLORS.map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    className={`w-8 h-8 rounded-full border-2 ${
-                      formData.color === color
-                        ? "border-gray-900 scale-110"
-                        : "border-gray-300"
-                    } transition-all`}
-                    style={{ backgroundColor: color }}
-                    onClick={() => setFormData((prev) => ({ ...prev, color }))}
-                  />
-                ))}
-              </div>
-              <div className="flex items-center gap-2 mt-2">
-                <Palette className="w-4 h-4" />
-                <span className="text-sm text-muted-foreground">
-                  Warna terpilih: {formData.color}
-                </span>
-              </div>
-            </div>
-
-            {/* Icon Picker */}
-            <div className="space-y-2">
-              <Label>Ikon Kategori</Label>
-              <div className="grid grid-cols-6 gap-2 max-h-32 overflow-y-auto">
-                {AVAILABLE_ICONS.map((iconData) => {
-                  const IconComponent = iconData.icon;
-                  return (
-                    <button
-                      key={iconData.name}
-                      type="button"
-                      className={`p-2 rounded border ${
-                        formData.icon === iconData.name
-                          ? "border-primary bg-primary/10"
-                          : "border-gray-300 hover:border-gray-400"
-                      } transition-colors`}
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          icon: iconData.name,
-                        }))
-                      }
-                    >
-                      <IconComponent className="w-4 h-4" />
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Preview */}
-            <div className="space-y-2">
-              <Label>Preview</Label>
-              <div className="flex items-center gap-3 p-3 border rounded-lg">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: formData.color }}
-                >
-                  {(() => {
-                    const IconComponent = getIconComponent(formData.icon);
-                    return <IconComponent className="w-5 h-5 text-white" />;
-                  })()}
-                </div>
-                <div>
-                  <p className="font-medium">
-                    {formData.name || "Nama Kategori"}
-                  </p>
-                  <Badge
-                    variant={
-                      formData.type === "income" ? "default" : "secondary"
-                    }
-                  >
-                    {formData.type === "income" ? "Pemasukan" : "Pengeluaran"}
-                  </Badge>
-                </div>
-              </div>
-            </div>
-
-            {/* Form Actions */}
-            <div className="flex gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleCloseForm}
-                className="flex-1"
-              >
-                Batal
-              </Button>
-              <Button type="submit" className="flex-1">
-                {editingCategory ? "Perbarui" : "Simpan"}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog
-        open={!!deleteCategory}
-        onOpenChange={() => setDeleteCategory(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Kategori</AlertDialogTitle>
-            <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus kategori "{deleteCategory?.name}
-              "? Tindakan ini tidak dapat dibatalkan dan kategori yang sedang
-              digunakan oleh transaksi tidak dapat dihapus.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700"
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <div
+              className={`p-2 sm:p-3 rounded-lg bg-white/60 ${iconColors[color]}`}
             >
-              Hapus
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-}
+              <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+            </div>
+          </div>
+          <div>
+            <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
+              {title}
+            </p>
+            {isLoading ? (
+              <div className="h-6 sm:h-8 bg-white/60 animate-pulse rounded"></div>
+            ) : (
+              <p className="text-lg sm:text-2xl font-bold text-gray-900">
+                {amount}
+              </p>
+            )}
+            {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
+          </div>
+        </div>
+      );
+    };
 
-// Category Grid Component
-interface CategoryGridProps {
-  categories: Category[];
-  loading: boolean;
-  onEdit: (category: Category) => void;
-  onDelete: (category: Category) => void;
-  getIconComponent: (iconName: string) => any;
-}
+    if (!user) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <Wallet className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500">
+              Silakan masuk untuk mengakses kategori
+            </p>
+          </div>
+        </div>
+      );
+    }
 
-function CategoryGrid({
-  categories,
-  loading,
-  onEdit,
-  onDelete,
-  getIconComponent,
-}: CategoryGridProps) {
-  if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-muted rounded-full" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-muted rounded w-3/4" />
-                  <div className="h-3 bg-muted rounded w-1/2" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                Kategori
+              </h1>
+              <p className="text-sm sm:text-base text-gray-600">
+                Kelola kategori pemasukan dan pengeluaran Anda
+              </p>
+            </div>
+            <Button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg font-medium text-sm sm:text-base"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Tambah Kategori</span>
+              <span className="sm:hidden">Tambah</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <SummaryCard
+            title="Total Kategori"
+            amount={categories.length}
+            icon={Grid3X3}
+            color="blue"
+            subtitle="Semua kategori aktif"
+            isLoading={loading}
+          />
+          <SummaryCard
+            title="Pemasukan"
+            amount={incomeCategories.length}
+            icon={TrendingUp}
+            color="green"
+            subtitle="Kategori pemasukan"
+            isLoading={loading}
+          />
+          <SummaryCard
+            title="Pengeluaran"
+            amount={expenseCategories.length}
+            icon={TrendingDown}
+            color="red"
+            subtitle="Kategori pengeluaran"
+            isLoading={loading}
+          />
+          <SummaryCard
+            title="Default"
+            amount={categories.filter(cat => cat.is_default).length}
+            icon={Wallet}
+            color="purple"
+            subtitle="Kategori bawaan"
+            isLoading={loading}
+          />
+        </div>
+
+        {/* Categories Content */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">
+            Daftar Kategori
+          </h2>
+
+          {/* Categories Tabs */}
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="all">Semua Kategori</TabsTrigger>
+              <TabsTrigger value="income">Pemasukan</TabsTrigger>
+              <TabsTrigger value="expense">Pengeluaran</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="all" className="space-y-4">
+              <CategoryGrid
+                categories={categories}
+                loading={loading}
+                onEdit={handleEdit}
+                onDelete={setDeleteCategory}
+                getIconComponent={getIconComponent}
+              />
+            </TabsContent>
+
+            <TabsContent value="income" className="space-y-4">
+              <CategoryGrid
+                categories={incomeCategories}
+                loading={loading}
+                onEdit={handleEdit}
+                onDelete={setDeleteCategory}
+                getIconComponent={getIconComponent}
+              />
+            </TabsContent>
+
+            <TabsContent value="expense" className="space-y-4">
+              <CategoryGrid
+                categories={expenseCategories}
+                loading={loading}
+                onEdit={handleEdit}
+                onDelete={setDeleteCategory}
+                getIconComponent={getIconComponent}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Category Form Component */}
+        <CategoryForm
+          open={showForm}
+          onOpenChange={setShowForm}
+          editingCategory={editingCategory}
+          onSubmit={handleFormSubmit}
+          onCancel={handleFormCancel}
+        />
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog
+          open={!!deleteCategory}
+          onOpenChange={() => setDeleteCategory(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Hapus Kategori</AlertDialogTitle>
+              <AlertDialogDescription>
+                Apakah Anda yakin ingin menghapus kategori "{deleteCategory?.name}
+                "? Tindakan ini tidak dapat dibatalkan dan kategori yang sedang
+                digunakan oleh transaksi tidak dapat dihapus.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Batal</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDelete}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Hapus
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     );
   }
 
-  if (categories.length === 0) {
-    return (
-      <Card>
-        <CardContent className="text-center py-8">
-          <Grid3X3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">Belum ada kategori</p>
-        </CardContent>
-      </Card>
-    );
+  // Category Grid Component
+  interface CategoryGridProps {
+    categories: Category[];
+    loading: boolean;
+    onEdit: (category: Category) => void;
+    onDelete: (category: Category) => void;
+    getIconComponent: (iconName: string) => any;
   }
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {categories.map((category) => {
-        const IconComponent = getIconComponent(category.icon);
-        return (
-          <Card key={category.id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
+  function CategoryGrid({
+    categories,
+    loading,
+    onEdit,
+    onDelete,
+    getIconComponent,
+  }: CategoryGridProps) {
+    if (loading) {
+      return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="p-4 border border-gray-200 rounded-lg animate-pulse">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (categories.length === 0) {
+      return (
+        <div className="text-center py-8">
+          <Grid3X3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500">Belum ada kategori</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        {categories.map((category) => {
+          const IconComponent = getIconComponent(category.icon);
+          return (
+            <div 
+              key={category.id} 
+              className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-all bg-white"
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: category.color }}
                   >
-                    <IconComponent className="w-6 h-6 text-white" />
+                    <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <div>
-                    <h3 className="font-medium">{category.name}</h3>
-                    <Badge
-                      variant={
-                        category.type === "income" ? "default" : "secondary"
-                      }
-                      className="text-xs"
-                    >
-                      {category.type === "income" ? "Pemasukan" : "Pengeluaran"}
-                    </Badge>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-medium text-gray-900 truncate text-sm sm:text-base">
+                      {category.name}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge
+                        variant={
+                          category.type === "income" ? "default" : "secondary"
+                        }
+                        className="text-xs"
+                      >
+                        {category.type === "income" ? "Pemasukan" : "Pengeluaran"}
+                      </Badge>
+                      {category.is_default && (
+                        <Badge variant="outline" className="text-xs">
+                          Default
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex gap-1">
+                <div className="flex gap-1 flex-shrink-0">
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => onEdit(category)}
+                    className="h-8 w-8 p-0 hover:bg-gray-100"
                   >
                     <Edit2 className="w-4 h-4" />
                   </Button>
@@ -646,17 +506,16 @@ function CategoryGrid({
                       size="sm"
                       variant="ghost"
                       onClick={() => onDelete(category)}
-                      className="text-red-600 hover:text-red-700"
+                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        );
-      })}
-    </div>
-  );
-}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }

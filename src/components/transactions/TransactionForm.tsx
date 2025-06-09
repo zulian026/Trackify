@@ -15,6 +15,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   Loader2,
   Plus,
   Minus,
@@ -46,7 +53,7 @@ interface TransactionFormProps {
   onCancel: () => void;
 }
 
-// Komponen Kalkulator Input
+// Komponen Kalkulator yang Ringkas
 interface CalculatorInputProps {
   value: number;
   onChange: (value: number) => void;
@@ -97,14 +104,6 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
     setPreviousValue("");
     setOperation("");
     setWaitingForNewValue(false);
-  };
-
-  const backspace = () => {
-    if (display.length > 1) {
-      setDisplay(display.slice(0, -1));
-    } else {
-      setDisplay("0");
-    }
   };
 
   const performOperation = (nextOperation: string) => {
@@ -180,27 +179,23 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
     }).format(num);
   };
 
-  const CalculatorButton: React.FC<{
+  const CalcButton: React.FC<{
     onClick: () => void;
     children: React.ReactNode;
-    variant?: "default" | "operation" | "equals" | "secondary";
+    variant?: "default" | "operation" | "equals";
     className?: string;
   }> = ({ onClick, children, variant = "default", className = "" }) => {
-    const baseClass =
-      "h-10 text-sm font-semibold transition-all duration-150 hover:scale-105 border border-gray-300";
     const variants = {
-      default: "bg-white hover:bg-gray-50 text-gray-900",
-      operation: "bg-blue-600 hover:bg-blue-700 text-white border-blue-600",
-      equals: "bg-green-600 hover:bg-green-700 text-white border-green-600",
-      secondary: "bg-gray-100 hover:bg-gray-200 text-gray-700",
+      default: "bg-white hover:bg-gray-50 text-gray-900 border-gray-300",
+      operation: "bg-blue-500 hover:bg-blue-600 text-white",
+      equals: "bg-green-500 hover:bg-green-600 text-white",
     };
 
     return (
       <Button
         type="button"
         onClick={onClick}
-        className={`${baseClass} ${variants[variant]} ${className}`}
-        variant="ghost"
+        className={`h-8 text-xs ${variants[variant]} ${className}`}
         size="sm"
       >
         {children}
@@ -209,13 +204,12 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
   };
 
   return (
-    <div className="space-y-3">
-      <Label className="text-sm font-medium text-gray-900">{label} *</Label>
-
-      {/* Input dengan tombol kalkulator */}
+    <div className="space-y-2">
+      <Label className="text-sm font-medium">{label} *</Label>
+      
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <DollarSign className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
             type="number"
             step="0.01"
@@ -223,155 +217,88 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder="0.00"
-            className="pl-9 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+            className="pl-8 h-9"
             required
           />
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          onClick={() => setShowCalculator(!showCalculator)}
-          className="shrink-0 border-gray-300 text-gray-700 hover:bg-gray-50"
-        >
-          <Calculator className="h-4 w-4" />
-        </Button>
-      </div>
-
-      {/* Preview mata uang */}
-      {parseFloat(inputValue) > 0 && (
-        <Badge
-          variant="secondary"
-          className="text-sm bg-gray-100 text-gray-700"
-        >
-          {formatCurrency(inputValue)}
-        </Badge>
-      )}
-
-      {/* Kalkulator */}
-      {showCalculator && (
-        <Card className="w-full border-gray-200">
-          <CardHeader className="pb-3 border-b border-gray-200">
-            <CardTitle className="text-base flex items-center justify-between text-gray-900">
-              <span>Kalkulator</span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowCalculator(false)}
-                className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 p-4">
-            {/* Display */}
-            <div className="bg-gray-50 p-4 rounded-lg text-right border border-gray-200">
-              <div className="text-xs text-gray-500 h-4">
-                {previousValue && operation && `${previousValue} ${operation}`}
-              </div>
-              <div className="text-xl font-bold text-gray-900">{display}</div>
-              <div className="text-xs text-green-600 mt-1">
-                {formatCurrency(display)}
-              </div>
-            </div>
-
-            {/* Tombol-tombol */}
-            <div className="grid grid-cols-4 gap-2">
-              {/* Baris 1 */}
-              <CalculatorButton
-                onClick={clear}
-                variant="secondary"
-                className="col-span-2"
-              >
-                Clear
-              </CalculatorButton>
-              <CalculatorButton onClick={backspace} variant="secondary">
-                <Delete className="h-3 w-3" />
-              </CalculatorButton>
-              <CalculatorButton
-                onClick={() => performOperation("÷")}
-                variant="operation"
-              >
-                <Divide className="h-3 w-3" />
-              </CalculatorButton>
-
-              {/* Baris 2 */}
-              <CalculatorButton onClick={() => inputDigit("7")}>
-                7
-              </CalculatorButton>
-              <CalculatorButton onClick={() => inputDigit("8")}>
-                8
-              </CalculatorButton>
-              <CalculatorButton onClick={() => inputDigit("9")}>
-                9
-              </CalculatorButton>
-              <CalculatorButton
-                onClick={() => performOperation("×")}
-                variant="operation"
-              >
-                <X className="h-3 w-3" />
-              </CalculatorButton>
-
-              {/* Baris 3 */}
-              <CalculatorButton onClick={() => inputDigit("4")}>
-                4
-              </CalculatorButton>
-              <CalculatorButton onClick={() => inputDigit("5")}>
-                5
-              </CalculatorButton>
-              <CalculatorButton onClick={() => inputDigit("6")}>
-                6
-              </CalculatorButton>
-              <CalculatorButton
-                onClick={() => performOperation("-")}
-                variant="operation"
-              >
-                <Minus className="h-3 w-3" />
-              </CalculatorButton>
-
-              {/* Baris 4 */}
-              <CalculatorButton onClick={() => inputDigit("1")}>
-                1
-              </CalculatorButton>
-              <CalculatorButton onClick={() => inputDigit("2")}>
-                2
-              </CalculatorButton>
-              <CalculatorButton onClick={() => inputDigit("3")}>
-                3
-              </CalculatorButton>
-              <CalculatorButton
-                onClick={() => performOperation("+")}
-                variant="operation"
-              >
-                <Plus className="h-3 w-3" />
-              </CalculatorButton>
-
-              {/* Baris 5 */}
-              <CalculatorButton
-                onClick={() => inputDigit("0")}
-                className="col-span-2"
-              >
-                0
-              </CalculatorButton>
-              <CalculatorButton onClick={inputDecimal}>.</CalculatorButton>
-              <CalculatorButton onClick={handleEquals} variant="equals">
-                <Equal className="h-3 w-3" />
-              </CalculatorButton>
-            </div>
-
-            {/* Tombol gunakan nilai */}
+        
+        <Dialog open={showCalculator} onOpenChange={setShowCalculator}>
+          <DialogTrigger asChild>
             <Button
               type="button"
-              onClick={handleUseValue}
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              variant="outline"
               size="sm"
+              className="h-9 w-9 p-0"
             >
-              Gunakan: {formatCurrency(display)}
+              <Calculator className="h-4 w-4" />
             </Button>
-          </CardContent>
-        </Card>
+          </DialogTrigger>
+          <DialogContent className="max-w-xs">
+            <DialogHeader>
+              <DialogTitle className="text-sm">Kalkulator</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-3">
+              {/* Display */}
+              <div className="bg-gray-50 p-2 rounded text-right border">
+                <div className="text-xs text-gray-500 h-3">
+                  {previousValue && operation && `${previousValue} ${operation}`}
+                </div>
+                <div className="text-lg font-bold">{display}</div>
+                <div className="text-xs text-green-600">
+                  {formatCurrency(display)}
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="grid grid-cols-4 gap-1">
+                <CalcButton onClick={clear} className="col-span-2 text-xs">
+                  Clear
+                </CalcButton>
+                <CalcButton onClick={() => setDisplay(display.slice(0, -1))}>
+                  <Delete className="h-3 w-3" />
+                </CalcButton>
+                <CalcButton onClick={() => performOperation("÷")} variant="operation">
+                  ÷
+                </CalcButton>
+
+                <CalcButton onClick={() => inputDigit("7")}>7</CalcButton>
+                <CalcButton onClick={() => inputDigit("8")}>8</CalcButton>
+                <CalcButton onClick={() => inputDigit("9")}>9</CalcButton>
+                <CalcButton onClick={() => performOperation("×")} variant="operation">×</CalcButton>
+
+                <CalcButton onClick={() => inputDigit("4")}>4</CalcButton>
+                <CalcButton onClick={() => inputDigit("5")}>5</CalcButton>
+                <CalcButton onClick={() => inputDigit("6")}>6</CalcButton>
+                <CalcButton onClick={() => performOperation("-")} variant="operation">-</CalcButton>
+
+                <CalcButton onClick={() => inputDigit("1")}>1</CalcButton>
+                <CalcButton onClick={() => inputDigit("2")}>2</CalcButton>
+                <CalcButton onClick={() => inputDigit("3")}>3</CalcButton>
+                <CalcButton onClick={() => performOperation("+")} variant="operation">+</CalcButton>
+
+                <CalcButton onClick={() => inputDigit("0")} className="col-span-2">0</CalcButton>
+                <CalcButton onClick={inputDecimal}>.</CalcButton>
+                <CalcButton onClick={handleEquals} variant="equals">=</CalcButton>
+              </div>
+
+              <Button
+                type="button"
+                onClick={handleUseValue}
+                className="w-full h-8 text-xs bg-green-600 hover:bg-green-700"
+                size="sm"
+              >
+                Gunakan: {formatCurrency(display)}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {parseFloat(inputValue) > 0 && (
+        <Badge variant="secondary" className="text-xs">
+          {formatCurrency(inputValue)}
+        </Badge>
       )}
     </div>
   );
@@ -396,12 +323,10 @@ export default function TransactionForm({
     transaction_date: new Date().toISOString().split("T")[0],
   });
 
-  // Memuat kategori
   useEffect(() => {
     loadCategories();
   }, [userId]);
 
-  // Isi data jika sedang mengedit
   useEffect(() => {
     if (transaction) {
       setFormData({
@@ -421,7 +346,7 @@ export default function TransactionForm({
       setCategories(data);
     } catch (error) {
       toast({
-        title: "Terjadi Kesalahan",
+        title: "Error",
         description: "Gagal memuat kategori",
         variant: "destructive",
       });
@@ -465,7 +390,7 @@ export default function TransactionForm({
       onSuccess();
     } catch (error) {
       toast({
-        title: "Terjadi Kesalahan",
+        title: "Error",
         description:
           error instanceof Error
             ? error.message
@@ -481,7 +406,7 @@ export default function TransactionForm({
     setFormData((prev) => ({
       ...prev,
       type,
-      category_id: "", // Reset kategori saat jenis berubah
+      category_id: "",
     }));
   };
 
@@ -490,39 +415,37 @@ export default function TransactionForm({
   );
 
   return (
-    <div className="w-full max-w-lg mx-auto">
+    <div className="w-full max-w-md mx-auto">
       <Card className="border-gray-200">
-        <CardHeader className="border-b border-gray-200">
-          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-semibold text-gray-900">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base font-semibold">
             {formData.type === "income" ? (
-              <TrendingUp className="w-5 h-5 text-green-600" />
+              <TrendingUp className="w-4 h-4 text-green-600" />
             ) : (
-              <TrendingDown className="w-5 h-5 text-red-600" />
+              <TrendingDown className="w-4 h-4 text-red-600" />
             )}
-            {transaction ? "Edit Transaksi" : "Tambah Transaksi Baru"}
+            {transaction ? "Edit Transaksi" : "Tambah Transaksi"}
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <CardContent className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Jenis Transaksi */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-gray-900">
-                Jenis Transaksi
-              </Label>
-              <div className="flex gap-2">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Jenis Transaksi</Label>
+              <div className="grid grid-cols-2 gap-2">
                 <Button
                   type="button"
                   variant={formData.type === "income" ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleTypeChange("income")}
                   className={cn(
-                    "flex items-center gap-2 flex-1 transition-all duration-200",
+                    "flex items-center gap-1 h-8 text-xs",
                     formData.type === "income"
-                      ? "bg-green-600 hover:bg-green-700 text-white border-green-600"
-                      : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                      ? "bg-green-600 hover:bg-green-700 text-white"
+                      : "text-gray-700 hover:bg-gray-50"
                   )}
                 >
-                  <TrendingUp className="w-4 h-4" />
+                  <TrendingUp className="w-3 h-3" />
                   Pemasukan
                 </Button>
                 <Button
@@ -531,13 +454,13 @@ export default function TransactionForm({
                   size="sm"
                   onClick={() => handleTypeChange("expense")}
                   className={cn(
-                    "flex items-center gap-2 flex-1 transition-all duration-200",
+                    "flex items-center gap-1 h-8 text-xs",
                     formData.type === "expense"
-                      ? "bg-red-600 hover:bg-red-700 text-white border-red-600"
-                      : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                      ? "bg-red-600 hover:bg-red-700 text-white"
+                      : "text-gray-700 hover:bg-gray-50"
                   )}
                 >
-                  <TrendingDown className="w-4 h-4" />
+                  <TrendingDown className="w-3 h-3" />
                   Pengeluaran
                 </Button>
               </div>
@@ -556,15 +479,15 @@ export default function TransactionForm({
             />
 
             {/* Kategori */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                <Tag className="w-4 h-4" />
+            <div className="space-y-2">
+              <Label className="text-sm font-medium flex items-center gap-1">
+                <Tag className="w-3 h-3" />
                 Kategori *
               </Label>
               {loadingCategories ? (
-                <div className="flex items-center gap-2 text-sm text-gray-500 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Memuat kategori...
+                <div className="flex items-center gap-2 text-xs text-gray-500 p-2 bg-gray-50 rounded border">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Memuat...
                 </div>
               ) : (
                 <Select
@@ -574,7 +497,7 @@ export default function TransactionForm({
                   }
                   required
                 >
-                  <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                  <SelectTrigger className="h-9">
                     <SelectValue placeholder="Pilih kategori" />
                   </SelectTrigger>
                   <SelectContent>
@@ -582,32 +505,22 @@ export default function TransactionForm({
                       <SelectItem key={category.id} value={category.id}>
                         <div className="flex items-center gap-2">
                           <div
-                            className="w-3 h-3 rounded-full"
+                            className="w-2 h-2 rounded-full"
                             style={{ backgroundColor: category.color }}
                           />
-                          {category.name}
+                          <span className="text-sm">{category.name}</span>
                         </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               )}
-
-              {filteredCategories.length === 0 && !loadingCategories && (
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-yellow-800">
-                    Tidak ada kategori{" "}
-                    {formData.type === "income" ? "pemasukan" : "pengeluaran"}.
-                    Silakan buat terlebih dahulu.
-                  </p>
-                </div>
-              )}
             </div>
 
             {/* Tanggal */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
+            <div className="space-y-2">
+              <Label className="text-sm font-medium flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
                 Tanggal *
               </Label>
               <Input
@@ -619,16 +532,14 @@ export default function TransactionForm({
                     transaction_date: e.target.value,
                   }))
                 }
-                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                className="h-9"
                 required
               />
             </div>
 
             {/* Deskripsi */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-gray-900">
-                Deskripsi
-              </Label>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Deskripsi</Label>
               <Textarea
                 value={formData.description}
                 onChange={(e) =>
@@ -638,18 +549,18 @@ export default function TransactionForm({
                   }))
                 }
                 placeholder="Deskripsi opsional..."
-                rows={3}
-                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                rows={2}
+                className="resize-none text-sm"
               />
             </div>
 
             {/* Tombol Aksi */}
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-2 pt-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onCancel}
-                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
+                className="flex-1 h-9 text-xs"
                 disabled={loading}
               >
                 Batal
@@ -657,15 +568,15 @@ export default function TransactionForm({
               <Button
                 type="submit"
                 className={cn(
-                  "flex-1 text-white transition-all duration-200",
+                  "flex-1 h-9 text-xs text-white",
                   formData.type === "income"
                     ? "bg-green-600 hover:bg-green-700"
                     : "bg-red-600 hover:bg-red-700"
                 )}
                 disabled={loading || filteredCategories.length === 0}
               >
-                {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {transaction ? "Perbarui" : "Buat"}
+                {loading && <Loader2 className="w-3 h-3 mr-1 animate-spin" />}
+                {transaction ? "Perbarui" : "Simpan"}
               </Button>
             </div>
           </form>
