@@ -114,7 +114,7 @@ const menuItems = [
 
   {
     name: "Laporan",
-    href: "/dashboard/reports",
+    href: "/dashboard/report",
     icon: (
       <svg
         className="w-5 h-5"
