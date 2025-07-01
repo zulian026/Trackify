@@ -1,6 +1,6 @@
 // hooks/useDashboard.ts
 import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { TransactionService } from "@/lib/services/transactionService";
 import { Transaction, TransactionSummary } from "@/types/transaction";
 
@@ -26,7 +26,9 @@ export const useDashboard = (): DashboardData => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>(
+    []
+  );
   const [stats, setStats] = useState<DashboardStats>({
     totalBalance: 0,
     monthlyIncome: 0,
@@ -39,18 +41,22 @@ export const useDashboard = (): DashboardData => {
 
   const getDateRanges = () => {
     const now = new Date();
-    
+
     // Current month
     const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-      .toISOString().split('T')[0];
+      .toISOString()
+      .split("T")[0];
     const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-      .toISOString().split('T')[0];
-    
+      .toISOString()
+      .split("T")[0];
+
     // Previous month
     const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-      .toISOString().split('T')[0];
+      .toISOString()
+      .split("T")[0];
     const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0)
-      .toISOString().split('T')[0];
+      .toISOString()
+      .split("T")[0];
 
     return {
       currentMonthStart,
@@ -67,20 +73,35 @@ export const useDashboard = (): DashboardData => {
       setLoading(true);
       setError(null);
 
-      const { currentMonthStart, currentMonthEnd, prevMonthStart, prevMonthEnd } = getDateRanges();
+      const {
+        currentMonthStart,
+        currentMonthEnd,
+        prevMonthStart,
+        prevMonthEnd,
+      } = getDateRanges();
 
       // Load all data concurrently
       const [recentData, currentSummary, previousSummary] = await Promise.all([
         TransactionService.getRecentTransactions(user.id, 8),
-        TransactionService.getTransactionSummary(user.id, currentMonthStart, currentMonthEnd),
-        TransactionService.getTransactionSummary(user.id, prevMonthStart, prevMonthEnd),
+        TransactionService.getTransactionSummary(
+          user.id,
+          currentMonthStart,
+          currentMonthEnd
+        ),
+        TransactionService.getTransactionSummary(
+          user.id,
+          prevMonthStart,
+          prevMonthEnd
+        ),
       ]);
 
       // Calculate balance change
-      const balanceChange = currentSummary.net_balance - previousSummary.net_balance;
-      const balanceChangePercent = previousSummary.net_balance !== 0 
-        ? (balanceChange / Math.abs(previousSummary.net_balance)) * 100 
-        : 0;
+      const balanceChange =
+        currentSummary.net_balance - previousSummary.net_balance;
+      const balanceChangePercent =
+        previousSummary.net_balance !== 0
+          ? (balanceChange / Math.abs(previousSummary.net_balance)) * 100
+          : 0;
 
       setRecentTransactions(recentData);
       setStats({
@@ -92,10 +113,11 @@ export const useDashboard = (): DashboardData => {
         balanceChange,
         balanceChangePercent,
       });
-
     } catch (err) {
       console.error("Failed to load dashboard data:", err);
-      setError(err instanceof Error ? err.message : "Failed to load dashboard data");
+      setError(
+        err instanceof Error ? err.message : "Failed to load dashboard data"
+      );
     } finally {
       setLoading(false);
     }

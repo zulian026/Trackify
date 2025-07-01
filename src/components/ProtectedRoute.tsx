@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -9,9 +9,9 @@ interface ProtectedRouteProps {
   fallback?: React.ReactNode;
 }
 
-export default function ProtectedRoute({ 
-  children, 
-  fallback 
+export default function ProtectedRoute({
+  children,
+  fallback,
 }: ProtectedRouteProps) {
   const { user, loading, error, refreshSession } = useAuth();
   const router = useRouter();
@@ -21,9 +21,9 @@ export default function ProtectedRoute({
     if (!loading) {
       if (!user && error && retryCount < 3) {
         // Try to refresh session if there's an error
-        console.log('Attempting to refresh session...');
+        console.log("Attempting to refresh session...");
         refreshSession();
-        setRetryCount(prev => prev + 1);
+        setRetryCount((prev) => prev + 1);
       } else if (!user && !error) {
         // No user and no error means genuinely not authenticated
         router.push("/login");

@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { RecurringTransactionService } from "@/lib/services/recurringTransactionService";
 import { CategoryService } from "@/lib/services/categoryService";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 
 // Import types (you'll need to create these files)
 import type {

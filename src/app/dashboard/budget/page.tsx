@@ -21,7 +21,7 @@ import { BudgetService } from "@/lib/services/budgetService";
 import { CategoryService } from "@/lib/services/categoryService";
 import { Budget, BudgetWithSpending, CreateBudgetData } from "@/types/budget";
 import { Category } from "@/types/transaction";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import BudgetForm from "@/components/budget/BudgetForm";
 
 // Shadcn UI Components
@@ -272,7 +272,7 @@ const BudgetPage = () => {
             <div className="h-6 sm:h-8 bg-white/60 animate-pulse rounded"></div>
           ) : (
             <p className="text-lg sm:text-2xl font-bold text-gray-900">
-              {typeof amount === 'number' ? formatCurrency(amount) : amount}
+              {typeof amount === "number" ? formatCurrency(amount) : amount}
             </p>
           )}
           {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
@@ -333,8 +333,8 @@ const BudgetPage = () => {
   const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
   const totalSpent = budgets.reduce((sum, budget) => sum + budget.spent, 0);
   const totalRemaining = totalBudget - totalSpent;
-  const activeBudgets = budgets.filter(budget => budget.is_active);
-  const alertBudgets = budgets.filter(budget => budget.percentage >= 80);
+  const activeBudgets = budgets.filter((budget) => budget.is_active);
+  const alertBudgets = budgets.filter((budget) => budget.percentage >= 80);
 
   return (
     <div className="p-4 sm:p-6 max-w-7xl mx-auto">
@@ -414,7 +414,9 @@ const BudgetPage = () => {
           amount={totalSpent}
           icon={TrendingUp}
           color="red"
-          subtitle={`${totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0}% dari total budget`}
+          subtitle={`${
+            totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0
+          }% dari total budget`}
           isLoading={loading}
         />
         <SummaryCard
@@ -465,8 +467,12 @@ const BudgetPage = () => {
           <Tabs defaultValue="all" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="all">Semua Budget</TabsTrigger>
-              <TabsTrigger value="active">Aktif ({activeBudgets.length})</TabsTrigger>
-              <TabsTrigger value="alerts">Peringatan ({alertBudgets.length})</TabsTrigger>
+              <TabsTrigger value="active">
+                Aktif ({activeBudgets.length})
+              </TabsTrigger>
+              <TabsTrigger value="alerts">
+                Peringatan ({alertBudgets.length})
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="all" className="space-y-4">
@@ -668,7 +674,10 @@ function BudgetGridSkeleton() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="p-4 border border-gray-200 rounded-lg animate-pulse">
+        <div
+          key={i}
+          className="p-4 border border-gray-200 rounded-lg animate-pulse"
+        >
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded-full" />
             <div className="flex-1 space-y-2">

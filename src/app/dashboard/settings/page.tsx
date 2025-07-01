@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase"; // Make sure this import is present!
 import ProtectedRoute from "@/components/ProtectedRoute";
 

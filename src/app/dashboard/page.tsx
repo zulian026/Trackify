@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { TransactionService } from "@/lib/services/transactionService";
 import { BudgetService } from "@/lib/services/budgetService";
 import { Transaction, TransactionSummary } from "@/types/transaction";
@@ -228,7 +228,9 @@ export default function Dashboard() {
         className={`p-4 sm:p-6 rounded-xl border-2 ${colorClasses[color]} transition-all hover:shadow-lg`}
       >
         <div className="flex items-center justify-between mb-3 sm:mb-4">
-          <div className={`p-2 sm:p-3 rounded-lg bg-white/60 ${iconColors[color]}`}>
+          <div
+            className={`p-2 sm:p-3 rounded-lg bg-white/60 ${iconColors[color]}`}
+          >
             <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           {trend && trendPercent !== undefined && (
@@ -251,7 +253,9 @@ export default function Dashboard() {
           )}
         </div>
         <div>
-          <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">{title}</p>
+          <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
+            {title}
+          </p>
           <p className="text-lg sm:text-2xl font-bold text-gray-900">
             <span className="sm:hidden">{formatCurrencyCompact(amount)}</span>
             <span className="hidden sm:block">{formatCurrency(amount)}</span>
@@ -264,7 +268,9 @@ export default function Dashboard() {
   const BudgetWidget = () => (
     <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4 sm:mb-6">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Gambaran Budget</h2>
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+          Gambaran Budget
+        </h2>
         <Target className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
       </div>
 
@@ -273,17 +279,29 @@ export default function Dashboard() {
           {/* Ringkasan Budget */}
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <div className="text-center p-3 sm:p-4 bg-blue-50 rounded-lg">
-              <p className="text-xs sm:text-sm text-gray-600 mb-1">Total Budget</p>
+              <p className="text-xs sm:text-sm text-gray-600 mb-1">
+                Total Budget
+              </p>
               <p className="text-sm sm:text-lg font-bold text-blue-600">
-                <span className="sm:hidden">{formatCurrencyCompact(budgetSummary.totalBudget)}</span>
-                <span className="hidden sm:block">{formatCurrency(budgetSummary.totalBudget)}</span>
+                <span className="sm:hidden">
+                  {formatCurrencyCompact(budgetSummary.totalBudget)}
+                </span>
+                <span className="hidden sm:block">
+                  {formatCurrency(budgetSummary.totalBudget)}
+                </span>
               </p>
             </div>
             <div className="text-center p-3 sm:p-4 bg-green-50 rounded-lg">
-              <p className="text-xs sm:text-sm text-gray-600 mb-1">Sisa Budget</p>
+              <p className="text-xs sm:text-sm text-gray-600 mb-1">
+                Sisa Budget
+              </p>
               <p className="text-sm sm:text-lg font-bold text-green-600">
-                <span className="sm:hidden">{formatCurrencyCompact(budgetSummary.totalRemaining)}</span>
-                <span className="hidden sm:block">{formatCurrency(budgetSummary.totalRemaining)}</span>
+                <span className="sm:hidden">
+                  {formatCurrencyCompact(budgetSummary.totalRemaining)}
+                </span>
+                <span className="hidden sm:block">
+                  {formatCurrency(budgetSummary.totalRemaining)}
+                </span>
               </p>
             </div>
           </div>
@@ -378,7 +396,9 @@ export default function Dashboard() {
       ) : (
         <div className="text-center py-6 sm:py-8">
           <PieChart className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
-          <p className="text-sm sm:text-base text-gray-500 mb-2">Belum ada budget aktif</p>
+          <p className="text-sm sm:text-base text-gray-500 mb-2">
+            Belum ada budget aktif
+          </p>
           <button className="text-blue-600 text-sm font-medium hover:text-blue-700">
             Buat Budget Pertama
           </button>
@@ -393,7 +413,10 @@ export default function Dashboard() {
         <div className="animate-pulse">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-gray-200 h-24 sm:h-32 rounded-xl"></div>
+              <div
+                key={i}
+                className="bg-gray-200 h-24 sm:h-32 rounded-xl"
+              ></div>
             ))}
           </div>
           <div className="space-y-4 sm:space-y-6">
@@ -410,8 +433,12 @@ export default function Dashboard() {
     <div className="p-4 sm:p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-        <p className="text-sm sm:text-base text-gray-600">Ringkasan keuangan Anda bulan ini</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+          Dashboard
+        </h1>
+        <p className="text-sm sm:text-base text-gray-600">
+          Ringkasan keuangan Anda bulan ini
+        </p>
       </div>
 
       {/* Summary Cards */}
@@ -484,9 +511,12 @@ export default function Dashboard() {
                       {transaction.description || transaction.category?.name}
                     </p>
                     <p className="text-xs sm:text-sm text-gray-500">
-                      <span className="sm:hidden">{formatDateMobile(transaction.transaction_date)}</span>
+                      <span className="sm:hidden">
+                        {formatDateMobile(transaction.transaction_date)}
+                      </span>
                       <span className="hidden sm:inline">
-                        {transaction.category?.name} • {formatDate(transaction.transaction_date)}
+                        {transaction.category?.name} •{" "}
+                        {formatDate(transaction.transaction_date)}
                       </span>
                     </p>
                   </div>
@@ -500,8 +530,12 @@ export default function Dashboard() {
                     }`}
                   >
                     {transaction.type === "income" ? "+" : "-"}
-                    <span className="sm:hidden">{formatCurrencyCompact(Number(transaction.amount))}</span>
-                    <span className="hidden sm:inline">{formatCurrency(Number(transaction.amount))}</span>
+                    <span className="sm:hidden">
+                      {formatCurrencyCompact(Number(transaction.amount))}
+                    </span>
+                    <span className="hidden sm:inline">
+                      {formatCurrency(Number(transaction.amount))}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -510,7 +544,9 @@ export default function Dashboard() {
         ) : (
           <div className="text-center py-8 sm:py-12">
             <Clock className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
-            <p className="text-gray-500 text-sm sm:text-base">Belum ada transaksi</p>
+            <p className="text-gray-500 text-sm sm:text-base">
+              Belum ada transaksi
+            </p>
           </div>
         )}
       </div>
@@ -601,7 +637,9 @@ export default function Dashboard() {
               )}
               <span className="text-xs sm:text-sm font-medium">
                 <span className="sm:hidden">
-                  {formatCurrencyCompact(Math.abs(dashboardStats.balanceChange))}
+                  {formatCurrencyCompact(
+                    Math.abs(dashboardStats.balanceChange)
+                  )}
                 </span>
                 <span className="hidden sm:inline">
                   {formatCurrency(Math.abs(dashboardStats.balanceChange))}
