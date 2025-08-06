@@ -18,6 +18,9 @@ import {
   Wallet,
   Calendar,
   ChevronRight,
+  Activity,
+  BarChart3,
+  Eye,
 } from "lucide-react";
 import TransactionForm from "@/components/transactions/TransactionForm";
 import TransactionList from "@/components/transactions/TransactionList";
@@ -119,50 +122,50 @@ export default function TransactionsPage() {
     title,
     amount,
     icon: Icon,
-    color = "blue",
+    color = "gray",
     subtitle,
     isLoading = false,
   }: {
     title: string;
     amount: number;
     icon: any;
-    color?: "blue" | "green" | "red" | "purple";
+    color?: "gray" | "green" | "red" | "purple";
     subtitle?: string;
     isLoading?: boolean;
   }) => {
     const colorClasses = {
-      blue: "bg-blue-50 border-blue-200 text-blue-700",
-      green: "bg-green-50 border-green-200 text-green-700",
-      red: "bg-red-50 border-red-200 text-red-700",
-      purple: "bg-purple-50 border-purple-200 text-purple-700",
+      gray: "bg-white border-gray-200",
+      green: "bg-white border-gray-200",
+      red: "bg-white border-gray-200",
+      purple: "bg-white border-gray-200",
     };
 
     const iconColors = {
-      blue: "text-blue-600",
-      green: "text-green-600",
-      red: "text-red-600",
-      purple: "text-purple-600",
+      gray: "text-gray-600 bg-gray-50",
+      green: "text-green-600 bg-green-50",
+      red: "text-red-600 bg-red-50",
+      purple: "text-purple-600 bg-purple-50",
     };
 
     return (
       <div
-        className={`p-4 sm:p-6 rounded-xl border-2 ${colorClasses[color]} transition-all hover:shadow-lg`}
+        className={`p-4 sm:p-6 rounded-xl ${colorClasses[color]} border shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer`}
       >
-        <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div
-            className={`p-2 sm:p-3 rounded-lg bg-white/60 ${iconColors[color]}`}
+            className={`p-3 sm:p-4 rounded-lg ${iconColors[color]} transition-all duration-300`}
           >
             <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
         </div>
-        <div>
-          <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
+        <div className="space-y-1">
+          <p className="text-xs sm:text-sm font-medium text-gray-600 uppercase tracking-wide">
             {title}
           </p>
           {isLoading ? (
-            <div className="h-6 sm:h-8 bg-white/60 animate-pulse rounded"></div>
+            <div className="h-6 sm:h-8 bg-gray-200 animate-pulse rounded"></div>
           ) : (
-            <p className="text-lg sm:text-2xl font-bold text-gray-900">
+            <p className="text-xl sm:text-3xl font-bold text-gray-900 leading-none">
               <span className="sm:hidden">{formatCurrencyCompact(amount)}</span>
               <span className="hidden sm:block">{formatCurrency(amount)}</span>
             </p>
@@ -187,200 +190,246 @@ export default function TransactionsPage() {
   }
 
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-6 sm:mb-8">
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-              Transaksi
-            </h1>
-            <p className="text-sm sm:text-base text-gray-600">
-              Kelola pemasukan dan pengeluaran Anda
-            </p>
-          </div>
-          <Button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg font-medium text-sm sm:text-base"
-          >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Tambah Transaksi</span>
-            <span className="sm:hidden">Tambah</span>
-          </Button>
-        </div>
-
-        {/* Month indicator */}
-        <div className="flex items-center gap-2 mt-4">
-          <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-          <span className="text-sm sm:text-base text-gray-600 font-medium">
-            Ringkasan Bulan {getCurrentMonthName()}
-          </span>
-        </div>
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-        <SummaryCard
-          title="Saldo Bersih"
-          amount={summary?.net_balance || 0}
-          icon={Wallet}
-          color={summary && summary.net_balance >= 0 ? "blue" : "red"}
-          subtitle="Saldo bulan ini"
-          isLoading={loadingSummary}
-        />
-        <SummaryCard
-          title="Pemasukan"
-          amount={summary?.total_income || 0}
-          icon={TrendingUp}
-          color="green"
-          subtitle="Total pemasukan"
-          isLoading={loadingSummary}
-        />
-        <SummaryCard
-          title="Pengeluaran"
-          amount={summary?.total_expense || 0}
-          icon={TrendingDown}
-          color="red"
-          subtitle="Total pengeluaran"
-          isLoading={loadingSummary}
-        />
-        <SummaryCard
-          title="Transaksi"
-          amount={summary?.transaction_count || 0}
-          icon={Calendar}
-          color="purple"
-          subtitle="Jumlah transaksi"
-          isLoading={loadingSummary}
-        />
-      </div>
-
-      {/* Quick Stats */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">
-          Statistik Bulan Ini
-        </h2>
-
-        <div className="space-y-4 sm:space-y-6">
-          {/* Expense Ratio */}
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs sm:text-sm font-medium text-gray-600">
-                Rasio Pengeluaran
-              </span>
-              <span className="text-xs sm:text-sm font-semibold text-gray-900">
-                {summary && summary.total_income > 0
-                  ? (
-                      (summary.total_expense / summary.total_income) *
-                      100
-                    ).toFixed(1)
-                  : 0}
-                %
-              </span>
+    <div className="min-h-screen bg-white">
+      <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8 sm:mb-10">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-gray-50">
+                <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-gray-600" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-1">
+                  Transaksi
+                </h1>
+                <p className="text-sm sm:text-lg text-gray-600 font-medium">
+                  Kelola pemasukan dan pengeluaran Anda
+                </p>
+              </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-red-500 h-2 rounded-full transition-all duration-300"
-                style={{
-                  width: `${Math.min(
-                    summary && summary.total_income > 0
-                      ? (summary.total_expense / summary.total_income) * 100
-                      : 0,
-                    100
-                  )}%`,
-                }}
-              ></div>
-            </div>
-          </div>
-
-          {/* Average per Transaction */}
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs sm:text-sm font-medium text-gray-600">
-                Rata-rata per Transaksi
-              </span>
-              <span className="text-xs sm:text-sm font-semibold text-gray-900">
-                <span className="sm:hidden">
-                  {formatCurrencyCompact(
-                    summary && summary.transaction_count > 0
-                      ? (summary.total_income + summary.total_expense) /
-                          summary.transaction_count
-                      : 0
-                  )}
-                </span>
-                <span className="hidden sm:inline">
-                  {formatCurrency(
-                    summary && summary.transaction_count > 0
-                      ? (summary.total_income + summary.total_expense) /
-                          summary.transaction_count
-                      : 0
-                  )}
-                </span>
-              </span>
-            </div>
-          </div>
-
-          {/* Balance Status */}
-          <div className="pt-3 sm:pt-4 border-t border-gray-200">
-            <p className="text-xs sm:text-sm text-gray-600 mb-2">
-              Status Keuangan:
-            </p>
-            <div
-              className={`flex items-center gap-2 ${
-                summary && summary.net_balance >= 0
-                  ? "text-green-600"
-                  : "text-red-600"
-              }`}
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300"
             >
-              {summary && summary.net_balance >= 0 ? (
-                <TrendingUp className="w-4 h-4 flex-shrink-0" />
-              ) : (
-                <TrendingDown className="w-4 h-4 flex-shrink-0" />
-              )}
-              <span className="text-xs sm:text-sm font-medium">
-                {summary && summary.net_balance >= 0
-                  ? "Surplus - Kondisi keuangan baik"
-                  : "Defisit - Perlu perhatian lebih"}
-              </span>
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Tambah Transaksi</span>
+              <span className="sm:hidden">Tambah</span>
+            </button>
+          </div>
+
+          {/* Month indicator */}
+          <div className="flex items-center gap-2 mt-4">
+            <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+            <span className="text-sm sm:text-base text-gray-600 font-medium">
+              Ringkasan Bulan {getCurrentMonthName()}
+            </span>
+          </div>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10">
+          <SummaryCard
+            title="Saldo Bersih"
+            amount={summary?.net_balance || 0}
+            icon={Wallet}
+            color={summary && summary.net_balance >= 0 ? "gray" : "red"}
+            subtitle="Saldo bulan ini"
+            isLoading={loadingSummary}
+          />
+          <SummaryCard
+            title="Pemasukan"
+            amount={summary?.total_income || 0}
+            icon={TrendingUp}
+            color="green"
+            subtitle="Total pemasukan"
+            isLoading={loadingSummary}
+          />
+          <SummaryCard
+            title="Pengeluaran"
+            amount={summary?.total_expense || 0}
+            icon={TrendingDown}
+            color="red"
+            subtitle="Total pengeluaran"
+            isLoading={loadingSummary}
+          />
+          <SummaryCard
+            title="Transaksi"
+            amount={summary?.transaction_count || 0}
+            icon={Calendar}
+            color="gray"
+            subtitle="Jumlah transaksi"
+            isLoading={loadingSummary}
+          />
+        </div>
+
+        {/* Quick Stats Panel */}
+        <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-7 mb-8 shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center gap-3 mb-5 sm:mb-7">
+            <div className="p-2.5 rounded-lg bg-gray-50">
+              <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+              Statistik Bulan Ini
+            </h2>
+          </div>
+
+          <div className="space-y-6 sm:space-y-8">
+            {/* Expense Ratio */}
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm sm:text-base font-semibold text-gray-700">
+                  Rasio Pengeluaran
+                </span>
+                <span className="text-sm sm:text-base font-bold text-gray-900 bg-gray-100 px-3 py-1.5 rounded-full">
+                  {summary && summary.total_income > 0
+                    ? (
+                        (summary.total_expense / summary.total_income) *
+                        100
+                      ).toFixed(1)
+                    : 0}
+                  %
+                </span>
+              </div>
+              <div className="relative">
+                <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 overflow-hidden">
+                  <div
+                    className="bg-red-500 h-full rounded-full transition-all duration-700 ease-out"
+                    style={{
+                      width: `${Math.min(
+                        summary && summary.total_income > 0
+                          ? (summary.total_expense / summary.total_income) * 100
+                          : 0,
+                        100
+                      )}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Average per Transaction */}
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-white">
+                    <BarChart3 className="w-4 h-4 text-gray-600" />
+                  </div>
+                  <span className="text-sm sm:text-base font-semibold text-gray-700">
+                    Rata-rata per Transaksi
+                  </span>
+                </div>
+                <span className="text-sm sm:text-lg font-bold text-gray-900">
+                  <span className="sm:hidden">
+                    {formatCurrencyCompact(
+                      summary && summary.transaction_count > 0
+                        ? (summary.total_income + summary.total_expense) /
+                            summary.transaction_count
+                        : 0
+                    )}
+                  </span>
+                  <span className="hidden sm:inline">
+                    {formatCurrency(
+                      summary && summary.transaction_count > 0
+                        ? (summary.total_income + summary.total_expense) /
+                            summary.transaction_count
+                        : 0
+                    )}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            {/* Balance Status */}
+            <div className="pt-4 sm:pt-6 border-t border-gray-200">
+              <p className="text-sm sm:text-base text-gray-600 mb-3 font-medium">
+                Status Keuangan Bulan Ini:
+              </p>
+              <div
+                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 ${
+                  summary && summary.net_balance >= 0
+                    ? "text-green-700 bg-green-50 border-green-200"
+                    : "text-red-700 bg-red-50 border-red-200"
+                }`}
+              >
+                <div
+                  className={`p-2 rounded-lg ${
+                    summary && summary.net_balance >= 0
+                      ? "bg-green-100"
+                      : "bg-red-100"
+                  }`}
+                >
+                  {summary && summary.net_balance >= 0 ? (
+                    <TrendingUp className="w-5 h-5 flex-shrink-0" />
+                  ) : (
+                    <TrendingDown className="w-5 h-5 flex-shrink-0" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm sm:text-base font-bold mb-1">
+                    {summary && summary.net_balance >= 0
+                      ? "Surplus - Kondisi keuangan baik"
+                      : "Defisit - Perlu perhatian lebih"}
+                  </p>
+                  <p className="text-xs sm:text-sm opacity-80">
+                    Saldo bersih:{" "}
+                    <span className="sm:hidden">
+                      {formatCurrencyCompact(summary?.net_balance || 0)}
+                    </span>
+                    <span className="hidden sm:inline">
+                      {formatCurrency(summary?.net_balance || 0)}
+                    </span>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Transaction List */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-            Daftar Transaksi
-          </h2>
-          <button className="flex items-center gap-1 text-blue-600 text-sm font-medium hover:text-blue-700">
-            <span className="hidden sm:inline">Lihat Semua</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+        {/* Transaction List */}
+        <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-7 shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center justify-between mb-5 sm:mb-7">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-gray-50">
+                <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
+              </div>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+                Daftar Transaksi
+              </h2>
+            </div>
+            <button className="flex items-center gap-2 px-4 py-2 text-gray-600 text-sm font-semibold hover:text-gray-800 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all duration-300">
+              <span className="hidden sm:inline">Lihat Semua</span>
+              <Eye className="w-4 h-4 sm:hidden" />
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          <TransactionList
+            userId={user.id}
+            onEdit={handleEdit}
+            refreshTrigger={refreshTrigger}
+          />
         </div>
 
-        <TransactionList
-          userId={user.id}
-          onEdit={handleEdit}
-          refreshTrigger={refreshTrigger}
-        />
+        {/* Transaction Form Dialog */}
+        <Dialog open={showForm} onOpenChange={setShowForm}>
+          <DialogContent className="max-w-md">
+            
+              {/* <DialogTitle className="text-lg sm:text-xl font-semibold text-gray-900">
+                {editingTransaction
+                  ? "Edit Transaksi"
+                  : "Tambah Transaksi Baru"}
+              </DialogTitle> */}
+           
+            <TransactionForm
+              userId={user.id}
+              // transaction={editingTransaction || undefined}
+              onSuccess={handleFormSuccess}
+              onCancel={handleCloseForm}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
-
-      {/* Transaction Form Dialog */}
-      <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl font-semibold text-gray-900">
-              {editingTransaction ? "Edit Transaksi" : "Tambah Transaksi Baru"}
-            </DialogTitle>
-          </DialogHeader>
-          <TransactionForm
-            userId={user.id}
-            transaction={editingTransaction || undefined}
-            onSuccess={handleFormSuccess}
-            onCancel={handleCloseForm}
-          />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

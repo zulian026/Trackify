@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+body {
+  @apply bg-[#E8EBED] text-gray-800;
+  font-family: var(--font-poppins), sans-serif;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

@@ -75,63 +75,63 @@ const menuItems = [
       </svg>
     ),
   },
-  {
-    name: "Budget",
-    href: "/dashboard/budget",
-    icon: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-        />
-      </svg>
-    ),
-  },
-  {
-    name: "Transaksi Berulang",
-    href: "/dashboard/recurring",
-    icon: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M4 4v6h6M20 20v-6h-6M4 20l16-16"
-        />
-      </svg>
-    ),
-  },
-  {
-    name: "Laporan",
-    href: "/dashboard/report",
-    icon: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-        />
-      </svg>
-    ),
-  },
+  // {
+  //   name: "Budget",
+  //   href: "/dashboard/budget",
+  //   icon: (
+  //     <svg
+  //       className="w-5 h-5"
+  //       fill="none"
+  //       stroke="currentColor"
+  //       viewBox="0 0 24 24"
+  //     >
+  //       <path
+  //         strokeLinecap="round"
+  //         strokeLinejoin="round"
+  //         strokeWidth={2}
+  //         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+  //       />
+  //     </svg>
+  //   ),
+  // },
+  // {
+  //   name: "Transaksi Berulang",
+  //   href: "/dashboard/recurring",
+  //   icon: (
+  //     <svg
+  //       className="w-5 h-5"
+  //       fill="none"
+  //       stroke="currentColor"
+  //       viewBox="0 0 24 24"
+  //     >
+  //       <path
+  //         strokeLinecap="round"
+  //         strokeLinejoin="round"
+  //         strokeWidth={2}
+  //         d="M4 4v6h6M20 20v-6h-6M4 20l16-16"
+  //       />
+  //     </svg>
+  //   ),
+  // },
+  // {
+  //   name: "Laporan",
+  //   href: "/dashboard/report",
+  //   icon: (
+  //     <svg
+  //       className="w-5 h-5"
+  //       fill="none"
+  //       stroke="currentColor"
+  //       viewBox="0 0 24 24"
+  //     >
+  //       <path
+  //         strokeLinecap="round"
+  //         strokeLinejoin="round"
+  //         strokeWidth={2}
+  //         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+  //       />
+  //     </svg>
+  //   ),
+  // },
 ];
 
 export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }: SidebarProps) {
@@ -151,7 +151,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
       {/* Sidebar */}
       <div
         className={`
-        fixed top-0 left-0 z-50 h-full bg-white shadow-xl transform transition-all duration-300 ease-out border-r border-blue-50
+        fixed top-0 left-0 z-50 h-full bg-white transform transition-all duration-300 ease-out border-r border-green-100
         lg:translate-x-0 lg:fixed lg:z-30
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         ${isCollapsed ? "lg:w-20" : "lg:w-64"}
@@ -165,14 +165,14 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
           <div className={`flex items-center ${isCollapsed ? "lg:justify-center" : "space-x-3"}`}>
             <div className="relative group">
               <img
-                src="/Trackify.png"
+                src="/logo.png"
                 alt="Trackify"
                 className="w-8 h-8 rounded-xl shadow-md transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 rounded-xl bg-gradient-to-tr from-blue-400/20 to-blue-200/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             {!isCollapsed && (
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold text-black bg-clip-text">
                 TrackIfy
               </h1>
             )}
@@ -223,29 +223,29 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 overflow-y-auto">
-          <div className="space-y-2">
+        <nav className="flex-1 p-6 overflow-y-auto">
+          <div className="space-y-3">
             {menuItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`group flex items-center text-sm font-medium rounded-xl transition-all duration-200 relative ${
+                  className={`group flex items-center text-1xl font-medium rounded-xl transition-all duration-200 relative ${
                     isCollapsed 
                       ? "px-3 py-3 justify-center" 
                       : "px-4 py-3"
                   } ${
                     isActive
-                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25"
-                      : "text-gray-600 hover:bg-blue-50 hover:text-blue-600"
+                      ? "bg-gradient-to-r from-green-600 to-green-600 text-white shadow-lg shadow-blue-500/25"
+                      : "text-gray-600 hover:bg-blue-50 hover:text-green-600"
                   }`}
                   onClick={onClose}
                   title={isCollapsed ? item.name : undefined}
                 >
                   <span
                     className={`transition-transform duration-200 ${
-                      isActive ? "text-white scale-110" : "text-gray-500 group-hover:text-blue-500"
+                      isActive ? "text-white scale-110" : "text-gray-500 group-hover:text-green-500"
                     } ${isCollapsed ? "" : "mr-3"}`}
                   >
                     {item.icon}
@@ -278,29 +278,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
           </div>
         </nav>
 
-        {/* User info at bottom */}
-        <div className="p-4 border-t border-blue-50">
-          <div className={`flex items-center bg-gradient-to-r from-blue-50 to-white shadow-sm rounded-xl transition-all duration-300 ${
-            isCollapsed ? "p-3 justify-center" : "space-x-3 p-4"
-          }`}>
-            <div className="flex-shrink-0">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center shadow-sm">
-                <span className="text-white text-sm font-semibold">
-                  {user?.user_metadata?.full_name?.charAt(0)?.toUpperCase() ||
-                    user?.email?.charAt(0)?.toUpperCase()}
-                </span>
-              </div>
-            </div>
-            {!isCollapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">
-                  {user?.user_metadata?.full_name || "User"}
-                </p>
-                <p className="text-xs text-blue-600 truncate">{user?.email}</p>
-              </div>
-            )}
-          </div>
-        </div>
+        
       </div>
     </>
   );

@@ -41,9 +41,9 @@ function DashboardContent({ children }: DashboardLayoutProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-green-50/30 to-white">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-blue-200 border-t-green-600 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 font-medium">Loading your dashboard...</p>
         </div>
       </div>
@@ -55,7 +55,7 @@ function DashboardContent({ children }: DashboardLayoutProps) {
   }
 
   return (  
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-white to-white">
       {/* Sidebar */}
       <Sidebar 
         isOpen={sidebarOpen} 

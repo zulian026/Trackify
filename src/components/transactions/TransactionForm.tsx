@@ -35,6 +35,8 @@ import {
   Calendar,
   Tag,
   DollarSign,
+  ArrowUpRight,
+  ArrowDownRight,
 } from "lucide-react";
 import {
   Transaction,
@@ -187,29 +189,29 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
   }> = ({ onClick, children, variant = "default", className = "" }) => {
     const variants = {
       default: "bg-white hover:bg-gray-50 text-gray-900 border-gray-300",
-      operation: "bg-blue-500 hover:bg-blue-600 text-white",
-      equals: "bg-green-500 hover:bg-green-600 text-white",
+      operation: "bg-green-500 hover:bg-green-600 text-white",
+      equals: "bg-green-600 hover:bg-green-700 text-white",
     };
 
     return (
-      <Button
+      <button
         type="button"
         onClick={onClick}
-        className={`h-8 text-xs ${variants[variant]} ${className}`}
-        size="sm"
+        className={`h-10 px-3 rounded-lg border font-semibold text-sm transition-all duration-300 ${variants[variant]} ${className}`}
       >
         {children}
-      </Button>
+      </button>
     );
   };
 
   return (
-    <div className="space-y-2">
-      <Label className="text-sm font-medium">{label} *</Label>
-      
-      <div className="flex gap-2">
+    <div className="space-y-3">
+      <Label className="text-sm font-semibold text-gray-700">{label} *</Label>
+
+      <div className="flex gap-3">
         <div className="relative flex-1">
-          <DollarSign className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          {/* <p className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" /> */}
+          <p className="absolute left-3 top-1/3 transform -translate-y-1/3 w-4 h-4 text-gray-800">Rp</p>
           <Input
             type="number"
             step="0.01"
@@ -217,92 +219,122 @@ const CalculatorInput: React.FC<CalculatorInputProps> = ({
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder="0.00"
-            className="pl-8 h-9"
+            className="pl-10 h-11 border-gray-300 focus:border-green-500 focus:ring-green-500 bg-gray-50 focus:bg-white transition-all duration-300"
             required
           />
         </div>
-        
+
         <Dialog open={showCalculator} onOpenChange={setShowCalculator}>
           <DialogTrigger asChild>
-            <Button
+            <button
               type="button"
-              variant="outline"
-              size="sm"
-              className="h-9 w-9 p-0"
+              className="h-11 w-11 rounded-lg border border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-800 transition-all duration-300 flex items-center justify-center"
             >
               <Calculator className="h-4 w-4" />
-            </Button>
+            </button>
           </DialogTrigger>
           <DialogContent className="max-w-xs">
             <DialogHeader>
-              <DialogTitle className="text-sm">Kalkulator</DialogTitle>
+              <DialogTitle className="text-lg font-bold text-gray-900">
+                Kalkulator
+              </DialogTitle>
             </DialogHeader>
-            
-            <div className="space-y-3">
+
+            <div className="space-y-4">
               {/* Display */}
-              <div className="bg-gray-50 p-2 rounded text-right border">
-                <div className="text-xs text-gray-500 h-3">
-                  {previousValue && operation && `${previousValue} ${operation}`}
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <div className="text-xs text-gray-500 h-4 mb-1">
+                  {previousValue &&
+                    operation &&
+                    `${previousValue} ${operation}`}
                 </div>
-                <div className="text-lg font-bold">{display}</div>
-                <div className="text-xs text-green-600">
+                <div className="text-xl font-bold text-gray-900 mb-2">
+                  {display}
+                </div>
+                <div className="text-sm text-green-600 font-semibold">
                   {formatCurrency(display)}
                 </div>
               </div>
 
               {/* Buttons */}
-              <div className="grid grid-cols-4 gap-1">
-                <CalcButton onClick={clear} className="col-span-2 text-xs">
+              <div className="grid grid-cols-4 gap-2">
+                <CalcButton onClick={clear} className="col-span-2">
                   Clear
                 </CalcButton>
                 <CalcButton onClick={() => setDisplay(display.slice(0, -1))}>
-                  <Delete className="h-3 w-3" />
+                  <Delete className="h-4 w-4" />
                 </CalcButton>
-                <CalcButton onClick={() => performOperation("÷")} variant="operation">
+                <CalcButton
+                  onClick={() => performOperation("÷")}
+                  variant="operation"
+                >
                   ÷
                 </CalcButton>
 
                 <CalcButton onClick={() => inputDigit("7")}>7</CalcButton>
                 <CalcButton onClick={() => inputDigit("8")}>8</CalcButton>
                 <CalcButton onClick={() => inputDigit("9")}>9</CalcButton>
-                <CalcButton onClick={() => performOperation("×")} variant="operation">×</CalcButton>
+                <CalcButton
+                  onClick={() => performOperation("×")}
+                  variant="operation"
+                >
+                  ×
+                </CalcButton>
 
                 <CalcButton onClick={() => inputDigit("4")}>4</CalcButton>
                 <CalcButton onClick={() => inputDigit("5")}>5</CalcButton>
                 <CalcButton onClick={() => inputDigit("6")}>6</CalcButton>
-                <CalcButton onClick={() => performOperation("-")} variant="operation">-</CalcButton>
+                <CalcButton
+                  onClick={() => performOperation("-")}
+                  variant="operation"
+                >
+                  -
+                </CalcButton>
 
                 <CalcButton onClick={() => inputDigit("1")}>1</CalcButton>
                 <CalcButton onClick={() => inputDigit("2")}>2</CalcButton>
                 <CalcButton onClick={() => inputDigit("3")}>3</CalcButton>
-                <CalcButton onClick={() => performOperation("+")} variant="operation">+</CalcButton>
+                <CalcButton
+                  onClick={() => performOperation("+")}
+                  variant="operation"
+                >
+                  +
+                </CalcButton>
 
-                <CalcButton onClick={() => inputDigit("0")} className="col-span-2">0</CalcButton>
+                <CalcButton
+                  onClick={() => inputDigit("0")}
+                  className="col-span-2"
+                >
+                  0
+                </CalcButton>
                 <CalcButton onClick={inputDecimal}>.</CalcButton>
-                <CalcButton onClick={handleEquals} variant="equals">=</CalcButton>
+                <CalcButton onClick={handleEquals} variant="equals">
+                  =
+                </CalcButton>
               </div>
 
-              <Button
+              <button
                 type="button"
                 onClick={handleUseValue}
-                className="w-full h-8 text-xs bg-green-600 hover:bg-green-700"
-                size="sm"
+                className="w-full h-11 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all duration-300"
               >
                 Gunakan: {formatCurrency(display)}
-              </Button>
+              </button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
       {parseFloat(inputValue) > 0 && (
-        <Badge variant="secondary" className="text-xs">
+        <div className="inline-flex items-center px-3 py-1 bg-gray-100 rounded-full text-xs font-semibold text-gray-700">
           {formatCurrency(inputValue)}
-        </Badge>
+        </div>
       )}
     </div>
   );
 };
+
+// ... import tetap sama ...
 
 export default function TransactionForm({
   userId,
@@ -415,54 +447,65 @@ export default function TransactionForm({
   );
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <Card className="border-gray-200">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base font-semibold">
-            {formData.type === "income" ? (
-              <TrendingUp className="w-4 h-4 text-green-600" />
-            ) : (
-              <TrendingDown className="w-4 h-4 text-red-600" />
-            )}
-            {transaction ? "Edit Transaksi" : "Tambah Transaksi"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="w-full max-w-md mx-auto max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 px-2">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+        {/* Header */}
+        <div className="p-4 sm:p-5 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <div
+              className={`p-2 rounded-lg ${
+                formData.type === "income"
+                  ? "bg-green-50 border border-green-200"
+                  : "bg-red-50 border border-red-200"
+              }`}
+            >
+              {formData.type === "income" ? (
+                <ArrowUpRight className="w-5 h-5 text-green-600" />
+              ) : (
+                <ArrowDownRight className="w-5 h-5 text-red-600" />
+              )}
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+              {transaction ? "Edit Transaksi" : "Tambah Transaksi"}
+            </h2>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 sm:p-5">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             {/* Jenis Transaksi */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Jenis Transaksi</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-gray-700">
+                Jenis Transaksi
+              </Label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
                   type="button"
-                  variant={formData.type === "income" ? "default" : "outline"}
-                  size="sm"
                   onClick={() => handleTypeChange("income")}
                   className={cn(
-                    "flex items-center gap-1 h-8 text-xs",
+                    "flex items-center justify-center gap-2 h-10 px-4 rounded-lg border font-semibold text-sm transition-all duration-300",
                     formData.type === "income"
-                      ? "bg-green-600 hover:bg-green-700 text-white"
-                      : "text-gray-700 hover:bg-gray-50"
+                      ? "bg-green-600 hover:bg-green-700 text-white border-green-600"
+                      : "bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-300"
                   )}
                 >
-                  <TrendingUp className="w-3 h-3" />
+                  <ArrowUpRight className="w-4 h-4" />
                   Pemasukan
-                </Button>
-                <Button
+                </button>
+                <button
                   type="button"
-                  variant={formData.type === "expense" ? "default" : "outline"}
-                  size="sm"
                   onClick={() => handleTypeChange("expense")}
                   className={cn(
-                    "flex items-center gap-1 h-8 text-xs",
+                    "flex items-center justify-center gap-2 h-10 px-4 rounded-lg border font-semibold text-sm transition-all duration-300",
                     formData.type === "expense"
-                      ? "bg-red-600 hover:bg-red-700 text-white"
-                      : "text-gray-700 hover:bg-gray-50"
+                      ? "bg-red-600 hover:bg-red-700 text-white border-red-600"
+                      : "bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-300"
                   )}
                 >
-                  <TrendingDown className="w-3 h-3" />
+                  <ArrowDownRight className="w-4 h-4" />
                   Pengeluaran
-                </Button>
+                </button>
               </div>
             </div>
 
@@ -479,15 +522,15 @@ export default function TransactionForm({
             />
 
             {/* Kategori */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium flex items-center gap-1">
-                <Tag className="w-3 h-3" />
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                <Tag className="w-4 h-4" />
                 Kategori *
               </Label>
               {loadingCategories ? (
-                <div className="flex items-center gap-2 text-xs text-gray-500 p-2 bg-gray-50 rounded border">
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                  Memuat...
+                <div className="flex items-center gap-2 text-sm text-gray-500 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Memuat kategori...
                 </div>
               ) : (
                 <Select
@@ -497,7 +540,7 @@ export default function TransactionForm({
                   }
                   required
                 >
-                  <SelectTrigger className="h-9">
+                  <SelectTrigger className="h-10 border-gray-300 focus:border-green-500 focus:ring-green-500 bg-gray-50 focus:bg-white transition-all duration-300">
                     <SelectValue placeholder="Pilih kategori" />
                   </SelectTrigger>
                   <SelectContent>
@@ -505,7 +548,7 @@ export default function TransactionForm({
                       <SelectItem key={category.id} value={category.id}>
                         <div className="flex items-center gap-2">
                           <div
-                            className="w-2 h-2 rounded-full"
+                            className="w-3 h-3 rounded-full border border-white shadow-sm"
                             style={{ backgroundColor: category.color }}
                           />
                           <span className="text-sm">{category.name}</span>
@@ -518,9 +561,9 @@ export default function TransactionForm({
             </div>
 
             {/* Tanggal */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium flex items-center gap-1">
-                <Calendar className="w-3 h-3" />
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
                 Tanggal *
               </Label>
               <Input
@@ -532,14 +575,16 @@ export default function TransactionForm({
                     transaction_date: e.target.value,
                   }))
                 }
-                className="h-9"
+                className="h-10 border-gray-300 focus:border-green-500 focus:ring-green-500 bg-gray-50 focus:bg-white transition-all duration-300"
                 required
               />
             </div>
 
             {/* Deskripsi */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Deskripsi</Label>
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-gray-700">
+                Deskripsi
+              </Label>
               <Textarea
                 value={formData.description}
                 onChange={(e) =>
@@ -549,39 +594,38 @@ export default function TransactionForm({
                   }))
                 }
                 placeholder="Deskripsi opsional..."
-                rows={2}
-                className="resize-none text-sm"
+                rows={3}
+                className="resize-none text-sm border-gray-300 focus:border-green-500 focus:ring-green-500 bg-gray-50 focus:bg-white transition-all duration-300"
               />
             </div>
 
             {/* Tombol Aksi */}
-            <div className="flex gap-2 pt-2">
-              <Button
+            <div className="flex gap-3 pt-4 border-t border-gray-200">
+              <button
                 type="button"
-                variant="outline"
                 onClick={onCancel}
-                className="flex-1 h-9 text-xs"
                 disabled={loading}
+                className="flex-1 h-10 px-4 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
               >
                 Batal
-              </Button>
-              <Button
+              </button>
+              <button
                 type="submit"
+                disabled={loading || filteredCategories.length === 0}
                 className={cn(
-                  "flex-1 h-9 text-xs text-white",
+                  "flex-1 h-10 px-4 font-semibold rounded-lg text-white transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed",
                   formData.type === "income"
                     ? "bg-green-600 hover:bg-green-700"
                     : "bg-red-600 hover:bg-red-700"
                 )}
-                disabled={loading || filteredCategories.length === 0}
               >
-                {loading && <Loader2 className="w-3 h-3 mr-1 animate-spin" />}
+                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 {transaction ? "Perbarui" : "Simpan"}
-              </Button>
+              </button>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -89,7 +89,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
   const unreadCount = notifications.filter((n) => n.unread).length;
 
   return (
-    <header className="bg-white/80 backdrop-blur-md border-b border-blue-100 sticky top-0 z-20 shadow-sm">
+    <header className="bg-white/80 backdrop-blur-md border-b border-green-100 sticky top-0 z-3">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left side - Mobile menu button and title */}
@@ -117,7 +117,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
               <h2 className="text-xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
                 {currentPageName}
               </h2>
-              <p className="text-xs text-blue-600 hidden sm:block">
+              <p className="text-xs text-green-600 hidden sm:block">
                 Welcome back,{" "}
                 {user?.user_metadata?.full_name?.split(" ")[0] || "User"}!
               </p>
@@ -125,101 +125,31 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </div>
 
           {/* Right side - Notifications and User dropdown */}
+
+          
           <div className="flex items-center space-x-3">
             {/* Notification Bell */}
-            <div className="relative" ref={notificationRef}>
-              <button
-                onClick={() => setNotificationOpen(!notificationOpen)}
-                className="relative p-2 rounded-xl text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                title="Notifications"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 17h5l-3.403-3.403A1 1 0 0116 13V9a4 4 0 00-8 0v4a1 1 0 01-.597.903L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                  />
-                </svg>
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-medium">
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {/* Notification Dropdown */}
-              {notificationOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-blue-100 py-2 z-50">
-                  <div className="px-4 py-2 border-b border-blue-50">
-                    <h3 className="text-sm font-semibold text-gray-800">
-                      Notifications
-                    </h3>
-                  </div>
-                  <div className="max-h-64 overflow-y-auto">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`px-4 py-3 hover:bg-blue-50 cursor-pointer border-l-4 ${
-                          notification.type === "warning"
-                            ? "border-yellow-400"
-                            : notification.type === "success"
-                            ? "border-green-400"
-                            : "border-blue-400"
-                        } ${notification.unread ? "bg-blue-25" : ""}`}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-800">
-                              {notification.title}
-                            </p>
-                            <p className="text-xs text-gray-600 mt-1">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-blue-500 mt-1">
-                              {notification.time}
-                            </p>
-                          </div>
-                          {notification.unread && (
-                            <div className="w-2 h-2 bg-blue-500 rounded-full ml-2 mt-1"></div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="px-4 py-2 border-t border-blue-50">
-                    <button className="text-xs text-blue-600 hover:text-blue-800 font-medium">
-                      View all notifications
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            
 
             {/* User Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-50 to-white hover:from-blue-100 hover:to-blue-50 transition-all duration-200 border border-blue-100"
+                className="flex items-center space-x-7 px-3 py-2 rounded-xl bg-gradient-to-r from-green-50 to-white hover:from-green-100 hover:to-green-50 transition-all duration-200 border border-green-100"
               >
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center shadow-sm">
+                <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center shadow-sm">
                   <span className="text-white text-sm font-semibold">
                     {user?.user_metadata?.full_name?.charAt(0)?.toUpperCase() ||
                       user?.email?.charAt(0)?.toUpperCase()}
                   </span>
                 </div>
                 <div className="text-sm hidden sm:block text-left">
-                  <p className="font-semibold text-gray-800">
+                  <p className="font-bold text-gray-800">
                     {user?.user_metadata?.full_name || "User"}
                   </p>
-                  <p className="text-blue-600 text-xs truncate max-w-32">
+                  {/* <p className="text-green-600 text-xs truncate max-w-32">
                     {user?.email}
-                  </p>
+                  </p> */}
                 </div>
                 <svg
                   className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
@@ -240,16 +170,16 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
               {/* Dropdown Menu */}
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-blue-100 py-2 z-50">
-                  <div className="px-4 py-2 border-b border-blue-50">
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-green-200 py-2 z-50">
+                  <div className="px-4 py-2 border-b border-green-50">
                     <p className="text-sm font-semibold text-gray-800">
                       {user?.user_metadata?.full_name || "User"}
                     </p>
-                    <p className="text-xs text-blue-600">{user?.email}</p>
+                    <p className="text-xs text-green-600">{user?.email}</p>
                   </div>
 
                   <div className="py-2">
-                    <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center space-x-3">
+                    <button className="w-full px-4 py-2 text-left text-1xl text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center space-x-3">
                       <svg
                         className="w-4 h-4"
                         fill="none"
@@ -266,7 +196,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                       <span>Profile</span>
                     </button>
 
-                    <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center space-x-3">
+                    <button className="w-full px-4 py-2 text-left text-1xl text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center space-x-3">
                       <svg
                         className="w-4 h-4"
                         fill="none"
@@ -289,7 +219,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                       <span>Settings</span>
                     </button>
 
-                    <button className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center space-x-3">
+                    <button className="w-full px-4 py-2 text-left text-1xl text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center space-x-3">
                       <svg
                         className="w-4 h-4"
                         fill="none"

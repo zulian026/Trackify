@@ -10,6 +10,8 @@ import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
 // import CTASection from "@/components/home/CTASection";
 import FeaturesSection from "@/components/home/FeatureSection";
+import AboutSection from "@/components/home/AboutSection";
+import ContactSection from "@/components/home/ContactSection";
 
 export default function HomePage() {
   const { user, loading } = useAuth();
@@ -37,11 +39,12 @@ export default function HomePage() {
   if (user) return null;
 
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-white font-poppins">
       <Header />
       <HeroSection />
+      <AboutSection/>
       <FeaturesSection />
-
+      <ContactSection/>
       <Footer />
     </div>
   );

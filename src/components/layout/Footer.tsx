@@ -1,23 +1,54 @@
-// src/components/layout/Footer.tsx
-"use client";
-
+// src/components/Footer.js
 export default function Footer() {
   return (
-    <footer className=" py-12" style={{ backgroundColor: "#07305B" }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="flex items-center space-x-3 mb-4 md:mb-0">
-            <img
-              src="/Trackify.png"
-              alt="Trackify"
-              className="w-8 h-8 rounded-xl"
-            />
-            <span className="text-white text-xl font-semibold">Trackify</span>
-          </div>
-          <div className="text-white text-sm">
-            © 2025 Trackify. Semua hak dilindungi.
-          </div>
+    <footer className="text-gray-700 py-10 bg-white border border-b-gray-950">
+      <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-8">
+        {/* Brand */}
+        <div>
+          <h3 className="text-xl font-bold text-gray-800 mb-2">Trackify</h3>
+          <p className="text-sm">
+            Aplikasi manajemen keuangan pribadi untuk mencatat, memantau, dan
+            menganalisis pemasukan serta pengeluaran Anda dengan mudah.
+          </p>
         </div>
+
+        {/* Navigasi */}
+        <div>
+          <h4 className="font-semibold mb-2">Navigasi</h4>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <a href="#hero" className="hover:text-green-600">
+                Beranda
+              </a>
+            </li>
+            <li>
+              <a href="#features" className="hover:text-green-600">
+                Fitur
+              </a>
+            </li>
+            <li>
+              <a href="#about" className="hover:text-green-600">
+                Tentang
+              </a>
+            </li>
+            <li>
+              <a href="#contact" className="hover:text-green-600">
+                Kontak
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        {/* Kontak */}
+        <div>
+          <h4 className="font-semibold mb-2">Kontak</h4>
+          <p className="text-sm">Email: zulianalhisyam@gmial.com</p>
+          <p className="text-sm">WhatsApp: +62 852-7914-1146</p>
+        </div>
+      </div>
+
+      <div className="mt-10 border-t border-gray-200 pt-6 text-center text-sm text-gray-500">
+        &copy; {new Date().getFullYear()} Trackify. All rights reserved.
       </div>
     </footer>
   );

@@ -40,6 +40,9 @@ import {
   Tag,
   TrendingUp,
   TrendingDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  Clock,
 } from "lucide-react";
 import { Transaction, TransactionFilters, Category } from "@/types/transaction";
 import { TransactionService } from "@/lib/services/transactionService";
@@ -169,10 +172,25 @@ export default function TransactionList({
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("id-ID", {
-      day: "numeric",
+      day: "2-digit",
       month: "short",
       year: "numeric",
     });
+  };
+
+  const formatDateMobile = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "short",
+    });
+  };
+
+  const getTransactionIcon = (type: string) => {
+    return type === "income" ? (
+      <ArrowUpRight className="w-4 h-4 text-green-600" />
+    ) : (
+      <ArrowDownRight className="w-4 h-4 text-red-600" />
+    );
   };
 
   const resetFilters = () => {
@@ -187,11 +205,13 @@ export default function TransactionList({
 
   if (loading && transactions.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+      <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-7 shadow-sm">
         <div className="flex items-center justify-center py-8">
           <div className="flex items-center gap-2 text-gray-500">
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span className="text-sm sm:text-base">Memuat transaksi...</span>
+            <span className="text-sm sm:text-base font-medium">
+              Memuat transaksi...
+            </span>
           </div>
         </div>
       </div>
@@ -199,17 +219,19 @@ export default function TransactionList({
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-8">
       {/* Filter Section */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-        <div className="flex items-center gap-2 mb-4 sm:mb-6">
-          <Filter className="w-5 h-5 text-gray-600" />
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+      <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-7 shadow-sm hover:shadow-md transition-all duration-300">
+        <div className="flex items-center gap-3 mb-5 sm:mb-7">
+          <div className="p-2.5 rounded-lg bg-gray-50">
+            <Filter className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
+          </div>
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900">
             Filter Transaksi
           </h3>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 sm:space-y-5">
           {/* Search Input */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -219,7 +241,7 @@ export default function TransactionList({
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, search: e.target.value }))
               }
-              className="pl-9 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              className="pl-9 border-gray-300 focus:border-green-500 focus:ring-green-500 bg-gray-50 focus:bg-white transition-all duration-300"
             />
           </div>
 
@@ -236,7 +258,7 @@ export default function TransactionList({
                   }))
                 }
               >
-                <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                <SelectTrigger className="border-gray-300 focus:border-green-500 focus:ring-green-500 bg-gray-50 focus:bg-white transition-all duration-300">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -258,7 +280,7 @@ export default function TransactionList({
                   }))
                 }
               >
-                <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                <SelectTrigger className="border-gray-300 focus:border-green-500 focus:ring-green-500 bg-gray-50 focus:bg-white transition-all duration-300">
                   <SelectValue placeholder="Semua Kategori" />
                 </SelectTrigger>
                 <SelectContent>
@@ -267,7 +289,7 @@ export default function TransactionList({
                     <SelectItem key={category.id} value={category.id}>
                       <div className="flex items-center gap-2">
                         <div
-                          className="w-3 h-3 rounded-full"
+                          className="w-3 h-3 rounded-full border border-white shadow-sm"
                           style={{ backgroundColor: category.color }}
                         />
                         {category.name}
@@ -279,42 +301,29 @@ export default function TransactionList({
             </div>
 
             {/* Reset Button */}
-            <Button
-              variant="outline"
+            <button
               onClick={resetFilters}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-300"
             >
               Reset
-            </Button>
+            </button>
           </div>
         </div>
       </div>
 
       {/* Transaction List */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
-              Daftar Transaksi ({totalCount})
-            </h3>
-            {loading && (
-              <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-            )}
-          </div>
-        </div>
-
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
         {/* Content */}
-        <div className="p-4 sm:p-6">
+        <div className="p-5 sm:p-7">
           {transactions.length === 0 ? (
-            <div className="text-center py-8 sm:py-12">
-              <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                <Calendar className="w-8 h-8 text-gray-400" />
+            <div className="text-center py-10 sm:py-12">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-xl bg-gray-100 flex items-center justify-center">
+                <Clock className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" />
               </div>
-              <p className="text-gray-500 text-base sm:text-lg font-medium mb-2">
+              <p className="text-gray-500 text-sm sm:text-base font-medium mb-2">
                 Tidak ada transaksi ditemukan
               </p>
-              <p className="text-gray-400 text-sm sm:text-base">
+              <p className="text-gray-400 text-xs sm:text-sm">
                 Coba ubah filter atau tambahkan transaksi baru
               </p>
             </div>
@@ -323,116 +332,92 @@ export default function TransactionList({
               {transactions.map((transaction) => (
                 <div
                   key={transaction.id}
-                  className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+                  className="flex items-center justify-between p-4 sm:p-5 bg-gray-50 rounded-xl hover:bg-gray-100 border border-gray-200 transition-all duration-300 cursor-pointer"
                 >
-                  {/* Transaction Icon */}
-                  <div
-                    className={cn(
-                      "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0",
-                      transaction.type === "income"
-                        ? "bg-green-100 text-green-600"
-                        : "bg-red-100 text-red-600"
-                    )}
-                  >
-                    {transaction.type === "income" ? (
-                      <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />
-                    ) : (
-                      <TrendingDown className="w-5 h-5 sm:w-6 sm:h-6" />
-                    )}
-                  </div>
-
-                  {/* Transaction Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">
-                          {transaction.description || "Tanpa deskripsi"}
-                        </p>
-
-                        <div className="flex items-center gap-2 mt-1">
-                          <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500">
-                            <Calendar className="w-3 h-3 flex-shrink-0" />
-                            {formatDate(transaction.transaction_date)}
-                          </div>
-
+                  <div className="flex items-center gap-4 sm:gap-5 flex-1 min-w-0">
+                    <div
+                      className={`p-3 rounded-lg flex-shrink-0 ${
+                        transaction.type === "income"
+                          ? "bg-green-100 border border-green-200"
+                          : "bg-red-100 border border-red-200"
+                      }`}
+                    >
+                      {getTransactionIcon(transaction.type)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-gray-900 text-sm sm:text-base truncate mb-1">
+                        {transaction.description ||
+                          transaction.category?.name ||
+                          "Tanpa deskripsi"}
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-500 font-medium">
+                        <span className="sm:hidden">
+                          {formatDateMobile(transaction.transaction_date)}
+                        </span>
+                        <span className="hidden sm:inline flex items-center gap-2">
                           {transaction.category && (
-                            <Badge
-                              variant="secondary"
-                              className="flex items-center gap-1 text-xs bg-gray-100 text-gray-700 hover:bg-gray-200"
-                            >
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded-full text-xs">
                               <div
-                                className="w-2 h-2 rounded-full flex-shrink-0"
+                                className="w-2 h-2 rounded-full border border-white shadow-sm"
                                 style={{
                                   backgroundColor: transaction.category.color,
                                 }}
                               />
-                              <span className="truncate max-w-20 sm:max-w-none">
-                                {transaction.category.name}
-                              </span>
-                            </Badge>
+                              {transaction.category.name}
+                            </span>
                           )}
-                        </div>
-                      </div>
-
-                      {/* Amount and Actions */}
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <div className="text-right">
-                          <p className="text-sm sm:hidden font-semibold">
-                            <span
-                              className={cn(
-                                transaction.type === "income"
-                                  ? "text-green-600"
-                                  : "text-red-600"
-                              )}
-                            >
-                              {transaction.type === "income" ? "+" : "-"}
-                              {formatCurrencyCompact(transaction.amount)}
-                            </span>
-                          </p>
-                          <p className="hidden sm:block text-base font-semibold">
-                            <span
-                              className={cn(
-                                transaction.type === "income"
-                                  ? "text-green-600"
-                                  : "text-red-600"
-                              )}
-                            >
-                              {transaction.type === "income" ? "+" : "-"}
-                              {formatCurrency(transaction.amount)}
-                            </span>
-                          </p>
-                        </div>
-
-                        {/* Actions Menu */}
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="w-8 h-8 p-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                            >
-                              <MoreHorizontal className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem
-                              onClick={() => onEdit(transaction)}
-                              className="flex items-center gap-2 text-sm"
-                            >
-                              <Edit className="w-4 h-4" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => openDeleteDialog(transaction)}
-                              className="flex items-center gap-2 text-sm text-red-600 focus:text-red-600"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                              Hapus
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
+                          <span>•</span>
+                          <span>
+                            {formatDate(transaction.transaction_date)}
+                          </span>
+                        </span>
+                      </p>
                     </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-3">
+                    <div className="text-right">
+                      <p
+                        className={`font-bold text-sm sm:text-lg ${
+                          transaction.type === "income"
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {transaction.type === "income" ? "+" : "-"}
+                        <span className="sm:hidden">
+                          {formatCurrencyCompact(Number(transaction.amount))}
+                        </span>
+                        <span className="hidden sm:inline">
+                          {formatCurrency(Number(transaction.amount))}
+                        </span>
+                      </p>
+                    </div>
+
+                    {/* Actions Menu */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="w-8 h-8 p-0 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-all duration-300 flex items-center justify-center">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem
+                          onClick={() => onEdit(transaction)}
+                          className="flex items-center gap-2 text-sm"
+                        >
+                          <Edit className="w-4 h-4" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => openDeleteDialog(transaction)}
+                          className="flex items-center gap-2 text-sm text-red-600 focus:text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Hapus
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               ))}
@@ -441,32 +426,28 @@ export default function TransactionList({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between pt-6 border-t border-gray-200 gap-4">
-              <p className="text-sm text-gray-600 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row items-center justify-between pt-6 sm:pt-8 border-t border-gray-200 gap-4">
+              <p className="text-sm text-gray-600 text-center sm:text-left font-medium">
                 Menampilkan {(page - 1) * limit + 1} hingga{" "}
                 {Math.min(page * limit, totalCount)} dari {totalCount} transaksi
               </p>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
+                <button
                   onClick={() => setPage((prev) => Math.max(1, prev - 1))}
                   disabled={page === 1}
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                  className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                 >
                   Sebelumnya
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
+                </button>
+                <button
                   onClick={() =>
                     setPage((prev) => Math.min(totalPages, prev + 1))
                   }
                   disabled={page === totalPages}
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                  className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                 >
                   Selanjutnya
-                </Button>
+                </button>
               </div>
             </div>
           )}
@@ -487,24 +468,21 @@ export default function TransactionList({
           </DialogHeader>
 
           {transactionToDelete && (
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
               <div className="flex items-center gap-3 mb-2">
                 <div
                   className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center",
+                    "w-8 h-8 rounded-lg flex items-center justify-center",
                     transactionToDelete.type === "income"
-                      ? "bg-green-100 text-green-600"
-                      : "bg-red-100 text-red-600"
+                      ? "bg-green-100 text-green-600 border border-green-200"
+                      : "bg-red-100 text-red-600 border border-red-200"
                   )}
                 >
-                  {transactionToDelete.type === "income" ? (
-                    <TrendingUp className="w-4 h-4" />
-                  ) : (
-                    <TrendingDown className="w-4 h-4" />
-                  )}
+                  {getTransactionIcon(transactionToDelete.type)}
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900">
+                    {transactionToDelete.type === "income" ? "+" : "-"}
                     {formatCurrency(transactionToDelete.amount)}
                   </p>
                   <p className="text-sm text-gray-600">
@@ -513,42 +491,37 @@ export default function TransactionList({
                 </div>
               </div>
               {transactionToDelete.category && (
-                <Badge
-                  variant="secondary"
-                  className="flex items-center gap-1 w-fit bg-gray-100 text-gray-700"
-                >
+                <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-700">
                   <div
-                    className="w-2 h-2 rounded-full"
+                    className="w-2 h-2 rounded-full border border-white shadow-sm"
                     style={{
                       backgroundColor: transactionToDelete.category.color,
                     }}
                   />
                   {transactionToDelete.category.name}
-                </Badge>
+                </div>
               )}
             </div>
           )}
 
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
+            <button
               onClick={() => setDeleteDialogOpen(false)}
               disabled={deleting === transactionToDelete?.id}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
             >
               Batal
-            </Button>
-            <Button
-              variant="destructive"
+            </button>
+            <button
               onClick={handleDelete}
               disabled={deleting === transactionToDelete?.id}
-              className="bg-red-600 hover:bg-red-700"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center gap-2"
             >
               {deleting === transactionToDelete?.id && (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               )}
               Hapus
-            </Button>
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

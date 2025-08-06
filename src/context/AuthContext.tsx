@@ -1,9 +1,9 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { User, Session } from "@supabase/supabase-js";
+import { User, Session, Provider } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
-import { CategoryService } from "@/lib/services/categoryService"; // import dulu
+import { CategoryService } from "@/lib/services/categoryService";
 
 interface AuthContextType {
   user: User | null;
@@ -11,6 +11,7 @@ interface AuthContextType {
   loading: boolean;
   error: string | null;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithProvider: (provider: Provider) => Promise<{ error: any }>;
   signUp: (
     email: string,
     password: string,
@@ -103,6 +104,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log("Token refreshed successfully");
       } else if (event === "SIGNED_IN") {
         console.log("User signed in");
+        
+        // Check if this is a new user and create default categories
+        if (session?.user) {
+          await handleNewUserSetup(session.user);
+        }
       }
     });
 
@@ -111,6 +117,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe();
     };
   }, []);
+
+  const handleNewUserSetup = async (user: User) => {
+    try {
+      // Check if user already exists in users table
+      const { data: existingUser, error: checkError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("id", user.id)
+        .single();
+
+      if (checkError && checkError.code === "PGRST116") {
+        // User doesn't exist, create new user record
+        const { error: insertError } = await supabase.from("users").insert({
+          id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || user.user_metadata?.name || "User",
+          avatar_url: user.user_metadata?.avatar_url || null,
+        });
+
+        if (insertError) {
+          console.error("Failed to insert user data:", insertError);
+        } else {
+          // Create default categories for new user
+          try {
+            await CategoryService.createDefaultCategories(user.id);
+            console.log("Default categories created for new user.");
+          } catch (categoryError) {
+            console.error("Failed to create default categories:", categoryError);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error in new user setup:", err);
+    }
+  };
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -122,6 +163,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error };
     } catch (err) {
       const error = { message: "Sign in failed" };
+      setError(error.message);
+      return { error };
+    }
+  };
+
+  const signInWithProvider = async (provider: Provider) => {
+    try {
+      setError(null);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      return { error };
+    } catch (err) {
+      const error = { message: `${provider} sign in failed` };
       setError(error.message);
       return { error };
     }
@@ -150,15 +208,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (insertError) {
           console.error("Failed to insert user data:", insertError);
         } else {
-          // 👇 Tambahkan ini untuk membuat kategori default
+          // Create default categories for new user
           try {
             await CategoryService.createDefaultCategories(data.user.id);
             console.log("Default categories created for new user.");
           } catch (categoryError) {
-            console.error(
-              "Failed to create default categories:",
-              categoryError
-            );
+            console.error("Failed to create default categories:", categoryError);
           }
         }
       }
@@ -189,6 +244,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         error,
         signIn,
+        signInWithProvider,
         signUp,
         signOut,
         refreshSession,

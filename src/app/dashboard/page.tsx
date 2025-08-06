@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { TransactionService } from "@/lib/services/transactionService";
 import { BudgetService } from "@/lib/services/budgetService";
@@ -20,6 +21,11 @@ import {
   AlertTriangle,
   PieChart,
   ChevronRight,
+  Eye,
+  Plus,
+  Activity,
+  BarChart3,
+  Zap,
 } from "lucide-react";
 
 interface CategoryFormData {
@@ -49,6 +55,7 @@ interface BudgetSummary {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>(
     []
@@ -152,6 +159,10 @@ export default function Dashboard() {
     }
   };
 
+  const handleNavigateToBudget = () => {
+    router.push("/dashboard/budget");
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -200,47 +211,45 @@ export default function Dashboard() {
     icon: Icon,
     trend,
     trendPercent,
-    color = "blue",
+    color = "gray",
   }: {
     title: string;
     amount: number;
     icon: any;
     trend?: "up" | "down" | "neutral";
     trendPercent?: number;
-    color?: "blue" | "green" | "red" | "purple";
+    color?: "gray" | "green" | "red";
   }) => {
     const colorClasses = {
-      blue: "bg-blue-50 border-blue-200 text-blue-700",
-      green: "bg-green-50 border-green-200 text-green-700",
-      red: "bg-red-50 border-red-200 text-red-700",
-      purple: "bg-purple-50 border-purple-200 text-purple-700",
+      gray: "bg-white border-gray-200",
+      green: "bg-white border-gray-200",
+      red: "bg-white border-gray-200",
     };
 
     const iconColors = {
-      blue: "text-blue-600",
-      green: "text-green-600",
-      red: "text-red-600",
-      purple: "text-purple-600",
+      gray: "text-gray-600 bg-gray-50",
+      green: "text-green-600 bg-green-50",
+      red: "text-red-600 bg-red-50",
     };
 
     return (
       <div
-        className={`p-4 sm:p-6 rounded-xl border-2 ${colorClasses[color]} transition-all hover:shadow-lg`}
+        className={`p-4 sm:p-6 rounded-xl ${colorClasses[color]} border shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer`}
       >
-        <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div
-            className={`p-2 sm:p-3 rounded-lg bg-white/60 ${iconColors[color]}`}
+            className={`p-3 sm:p-4 rounded-lg ${iconColors[color]} transition-all duration-300`}
           >
             <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           {trend && trendPercent !== undefined && (
             <div
-              className={`flex items-center gap-1 text-xs sm:text-sm font-medium ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs sm:text-sm font-semibold ${
                 trend === "up"
-                  ? "text-green-600"
+                  ? "text-green-700 bg-green-100"
                   : trend === "down"
-                  ? "text-red-600"
-                  : "text-gray-600"
+                  ? "text-red-700 bg-red-100"
+                  : "text-gray-700 bg-gray-100"
               }`}
             >
               {trend === "up" ? (
@@ -252,11 +261,11 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-        <div>
-          <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
+        <div className="space-y-1">
+          <p className="text-xs sm:text-sm font-medium text-gray-600 uppercase tracking-wide">
             {title}
           </p>
-          <p className="text-lg sm:text-2xl font-bold text-gray-900">
+          <p className="text-xl sm:text-3xl font-bold text-gray-900 leading-none">
             <span className="sm:hidden">{formatCurrencyCompact(amount)}</span>
             <span className="hidden sm:block">{formatCurrency(amount)}</span>
           </p>
@@ -266,23 +275,31 @@ export default function Dashboard() {
   };
 
   const BudgetWidget = () => (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-      <div className="flex items-center justify-between mb-4 sm:mb-6">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-          Gambaran Budget
-        </h2>
-        <Target className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+    <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-7 shadow-sm hover:shadow-md transition-all duration-300">
+      <div className="flex items-center justify-between mb-5 sm:mb-7">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-lg bg-gray-50">
+            <Target className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
+          </div>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+            Gambaran Budget
+          </h2>
+        </div>
+        <BarChart3 className="w-5 h-5 text-gray-400" />
       </div>
 
       {budgetSummary.activeBudgets > 0 ? (
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-5 sm:space-y-7">
           {/* Ringkasan Budget */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            <div className="text-center p-3 sm:p-4 bg-blue-50 rounded-lg">
-              <p className="text-xs sm:text-sm text-gray-600 mb-1">
+          <div className="grid grid-cols-2 gap-4 sm:gap-5">
+            <div className="text-center p-4 sm:p-5 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all duration-300">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 rounded-lg bg-white flex items-center justify-center">
+                <Wallet className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+              </div>
+              <p className="text-xs sm:text-sm text-gray-600 mb-1 font-medium">
                 Total Budget
               </p>
-              <p className="text-sm sm:text-lg font-bold text-blue-600">
+              <p className="text-sm sm:text-lg font-bold text-gray-900">
                 <span className="sm:hidden">
                   {formatCurrencyCompact(budgetSummary.totalBudget)}
                 </span>
@@ -291,11 +308,14 @@ export default function Dashboard() {
                 </span>
               </p>
             </div>
-            <div className="text-center p-3 sm:p-4 bg-green-50 rounded-lg">
-              <p className="text-xs sm:text-sm text-gray-600 mb-1">
+            <div className="text-center p-4 sm:p-5 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all duration-300">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 rounded-lg bg-white flex items-center justify-center">
+                <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+              </div>
+              <p className="text-xs sm:text-sm text-gray-600 mb-1 font-medium">
                 Sisa Budget
               </p>
-              <p className="text-sm sm:text-lg font-bold text-green-600">
+              <p className="text-sm sm:text-lg font-bold text-gray-900">
                 <span className="sm:hidden">
                   {formatCurrencyCompact(budgetSummary.totalRemaining)}
                 </span>
@@ -307,12 +327,12 @@ export default function Dashboard() {
           </div>
 
           {/* Progress Budget */}
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs sm:text-sm font-medium text-gray-600">
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm sm:text-base font-semibold text-gray-700">
                 Total Terpakai
               </span>
-              <span className="text-xs sm:text-sm font-semibold text-gray-900">
+              <span className="text-sm sm:text-base font-bold text-gray-900 bg-gray-100 px-3 py-1 rounded-full">
                 {budgetSummary.totalBudget > 0
                   ? (
                       (budgetSummary.totalSpent / budgetSummary.totalBudget) *
@@ -322,66 +342,73 @@ export default function Dashboard() {
                 %
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3">
-              <div
-                className={`h-2 sm:h-3 rounded-full transition-all duration-300 ${
-                  budgetSummary.totalBudget > 0 &&
-                  budgetSummary.totalSpent / budgetSummary.totalBudget >= 0.8
-                    ? "bg-red-500"
-                    : budgetSummary.totalBudget > 0 &&
-                      budgetSummary.totalSpent / budgetSummary.totalBudget >=
-                        0.6
-                    ? "bg-yellow-500"
-                    : "bg-blue-500"
-                }`}
-                style={{
-                  width: `${Math.min(
-                    budgetSummary.totalBudget > 0
-                      ? (budgetSummary.totalSpent / budgetSummary.totalBudget) *
-                          100
-                      : 0,
-                    100
-                  )}%`,
-                }}
-              ></div>
+            <div className="relative">
+              <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ease-out ${
+                    budgetSummary.totalBudget > 0 &&
+                    budgetSummary.totalSpent / budgetSummary.totalBudget >= 0.8
+                      ? "bg-red-500"
+                      : budgetSummary.totalBudget > 0 &&
+                        budgetSummary.totalSpent / budgetSummary.totalBudget >=
+                          0.6
+                      ? "bg-orange-500"
+                      : "bg-gray-500"
+                  }`}
+                  style={{
+                    width: `${Math.min(
+                      budgetSummary.totalBudget > 0
+                        ? (budgetSummary.totalSpent /
+                            budgetSummary.totalBudget) *
+                            100
+                        : 0,
+                      100
+                    )}%`,
+                  }}
+                ></div>
+              </div>
             </div>
           </div>
 
           {/* Peringatan Budget */}
           {budgetAlerts.length > 0 && (
-            <div className="border-t pt-4">
-              <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle className="w-4 h-4 text-orange-500" />
-                <span className="text-xs sm:text-sm font-medium text-orange-600">
+            <div className="border-t border-gray-200 pt-5">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="p-1.5 rounded-lg bg-orange-100">
+                  <AlertTriangle className="w-4 h-4 text-orange-600" />
+                </div>
+                <span className="text-sm sm:text-base font-semibold text-orange-700">
                   {budgetAlerts.length} Budget Peringatan
                 </span>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {budgetAlerts.slice(0, 3).map((budget) => (
                   <div
                     key={budget.id}
-                    className="flex items-center justify-between p-2 bg-orange-50 rounded-lg"
+                    className="flex items-center justify-between p-3 bg-orange-50 rounded-xl border border-orange-200 hover:bg-orange-100 transition-all duration-300"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <div
-                        className="w-3 h-3 rounded-full"
+                        className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
                         style={{
                           backgroundColor:
                             budget.categories?.color || "#6B7280",
                         }}
                       ></div>
-                      <span className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                      <span className="text-sm sm:text-base font-semibold text-gray-900 truncate">
                         {budget.categories?.name}
                       </span>
                     </div>
-                    <span className="text-xs sm:text-sm font-semibold text-orange-600">
-                      {budget.percentage.toFixed(0)}%
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm sm:text-base font-bold text-orange-700 bg-orange-100 px-2.5 py-1 rounded-full">
+                        {budget.percentage.toFixed(0)}%
+                      </span>
+                    </div>
                   </div>
                 ))}
                 {budgetAlerts.length > 3 && (
-                  <p className="text-xs text-gray-500 text-center">
-                    +{budgetAlerts.length - 3} lainnya
+                  <p className="text-xs text-gray-500 text-center py-2 bg-gray-50 rounded-lg">
+                    +{budgetAlerts.length - 3} budget lainnya
                   </p>
                 )}
               </div>
@@ -389,17 +416,28 @@ export default function Dashboard() {
           )}
 
           {/* Jumlah Budget Aktif */}
-          <div className="text-center text-xs sm:text-sm text-gray-600">
-            {budgetSummary.activeBudgets} budget aktif
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full">
+              <Activity className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-semibold text-gray-700">
+                {budgetSummary.activeBudgets} budget aktif
+              </span>
+            </div>
           </div>
         </div>
       ) : (
-        <div className="text-center py-6 sm:py-8">
-          <PieChart className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
-          <p className="text-sm sm:text-base text-gray-500 mb-2">
+        <div className="text-center py-8 sm:py-10">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-xl bg-gray-100 flex items-center justify-center">
+            <PieChart className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" />
+          </div>
+          <p className="text-sm sm:text-base text-gray-500 mb-4 font-medium">
             Belum ada budget aktif
           </p>
-          <button className="text-blue-600 text-sm font-medium hover:text-blue-700">
+          <button 
+            onClick={handleNavigateToBudget}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-800 transition-all duration-300"
+          >
+            <Plus className="w-4 h-4" />
             Buat Budget Pertama
           </button>
         </div>
@@ -409,20 +447,20 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="p-4 sm:p-6">
-        <div className="animate-pulse">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+      <div className="p-4 sm:p-6 min-h-screen bg-white">
+        <div className="animate-pulse max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
-                className="bg-gray-200 h-24 sm:h-32 rounded-xl"
+                className="bg-gray-200 h-28 sm:h-36 rounded-xl"
               ></div>
             ))}
           </div>
-          <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-6">
+            <div className="bg-gray-200 h-96 sm:h-[28rem] rounded-xl"></div>
             <div className="bg-gray-200 h-80 sm:h-96 rounded-xl"></div>
-            <div className="bg-gray-200 h-64 sm:h-80 rounded-xl"></div>
-            <div className="bg-gray-200 h-64 sm:h-80 rounded-xl"></div>
+            <div className="bg-gray-200 h-72 sm:h-80 rounded-xl"></div>
           </div>
         </div>
       </div>
@@ -430,231 +468,280 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-          Dashboard
-        </h1>
-        <p className="text-sm sm:text-base text-gray-600">
-          Ringkasan keuangan Anda bulan ini
-        </p>
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-        <SummaryCard
-          title="Total Saldo"
-          amount={dashboardStats.totalBalance}
-          icon={Wallet}
-          trend={
-            dashboardStats.balanceChange > 0
-              ? "up"
-              : dashboardStats.balanceChange < 0
-              ? "down"
-              : "neutral"
-          }
-          trendPercent={dashboardStats.balanceChangePercent}
-          color="blue"
-        />
-        <SummaryCard
-          title="Pemasukan"
-          amount={dashboardStats.monthlyIncome}
-          icon={TrendingUp}
-          color="green"
-        />
-        <SummaryCard
-          title="Pengeluaran"
-          amount={dashboardStats.monthlyExpense}
-          icon={TrendingDown}
-          color="red"
-        />
-        <SummaryCard
-          title="Transaksi"
-          amount={dashboardStats.transactionCount}
-          icon={Calendar}
-          color="purple"
-        />
-      </div>
-
-      {/* Recent Transactions - Mobile First */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-            Transaksi Terbaru
-          </h2>
-          <button className="flex items-center gap-1 text-blue-600 text-sm font-medium hover:text-blue-700">
-            <span className="hidden sm:inline">Lihat Semua</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+    <div className="min-h-screen bg-white">
+      <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8 sm:mb-10">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="p-3 rounded-xl bg-gray-50">
+              <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-gray-600" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-1">
+                Dashboard
+              </h1>
+              <p className="text-sm sm:text-lg text-gray-600 font-medium">
+                Ringkasan keuangan Anda bulan ini
+              </p>
+            </div>
+          </div>
         </div>
 
-        {recentTransactions.length > 0 ? (
-          <div className="space-y-3 sm:space-y-4">
-            {recentTransactions.slice(0, 5).map((transaction) => (
-              <div
-                key={transaction.id}
-                className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                  <div
-                    className={`p-2 rounded-lg flex-shrink-0 ${
-                      transaction.type === "income"
-                        ? "bg-green-100"
-                        : "bg-red-100"
-                    }`}
-                  >
-                    {getTransactionIcon(transaction.type)}
+        {/* Summary Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10">
+          <SummaryCard
+            title="Total Saldo"
+            amount={dashboardStats.totalBalance}
+            icon={Wallet}
+            trend={
+              dashboardStats.balanceChange > 0
+                ? "up"
+                : dashboardStats.balanceChange < 0
+                ? "down"
+                : "neutral"
+            }
+            trendPercent={dashboardStats.balanceChangePercent}
+            color="gray"
+          />
+          <SummaryCard
+            title="Pemasukan"
+            amount={dashboardStats.monthlyIncome}
+            icon={TrendingUp}
+            color="green"
+          />
+          <SummaryCard
+            title="Pengeluaran"
+            amount={dashboardStats.monthlyExpense}
+            icon={TrendingDown}
+            color="red"
+          />
+          <SummaryCard
+            title="Transaksi"
+            amount={dashboardStats.transactionCount}
+            icon={Calendar}
+            color="gray"
+          />
+        </div>
+
+        {/* Recent Transactions */}
+        <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-7 mb-8 shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center justify-between mb-5 sm:mb-7">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-gray-50">
+                <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
+              </div>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+                Transaksi Terbaru
+              </h2>
+            </div>
+            <button className="flex items-center gap-2 px-4 py-2 text-gray-600 text-sm font-semibold hover:text-gray-800 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all duration-300">
+              <span className="hidden sm:inline">Lihat Semua</span>
+              <Eye className="w-4 h-4 sm:hidden" />
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          {recentTransactions.length > 0 ? (
+            <div className="space-y-3 sm:space-y-4">
+              {recentTransactions.slice(0, 5).map((transaction) => (
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between p-4 sm:p-5 bg-gray-50 rounded-xl hover:bg-gray-100 border border-gray-200 transition-all duration-300 cursor-pointer"
+                >
+                  <div className="flex items-center gap-4 sm:gap-5 flex-1 min-w-0">
+                    <div
+                      className={`p-3 rounded-lg flex-shrink-0 ${
+                        transaction.type === "income"
+                          ? "bg-green-100 border border-green-200"
+                          : "bg-red-100 border border-red-200"
+                      }`}
+                    >
+                      {getTransactionIcon(transaction.type)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-gray-900 text-sm sm:text-base truncate mb-1">
+                        {transaction.description || transaction.category?.name}
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-500 font-medium">
+                        <span className="sm:hidden">
+                          {formatDateMobile(transaction.transaction_date)}
+                        </span>
+                        <span className="hidden sm:inline flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded-full text-xs">
+                            {transaction.category?.name}
+                          </span>
+                          <span>•</span>
+                          <span>
+                            {formatDate(transaction.transaction_date)}
+                          </span>
+                        </span>
+                      </p>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-gray-900 text-sm sm:text-base truncate">
-                      {transaction.description || transaction.category?.name}
-                    </p>
-                    <p className="text-xs sm:text-sm text-gray-500">
+                  <div className="text-right flex-shrink-0 ml-3">
+                    <p
+                      className={`font-bold text-sm sm:text-lg ${
+                        transaction.type === "income"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {transaction.type === "income" ? "+" : "-"}
                       <span className="sm:hidden">
-                        {formatDateMobile(transaction.transaction_date)}
+                        {formatCurrencyCompact(Number(transaction.amount))}
                       </span>
                       <span className="hidden sm:inline">
-                        {transaction.category?.name} •{" "}
-                        {formatDate(transaction.transaction_date)}
+                        {formatCurrency(Number(transaction.amount))}
                       </span>
                     </p>
                   </div>
                 </div>
-                <div className="text-right flex-shrink-0 ml-2">
-                  <p
-                    className={`font-semibold text-sm sm:text-base ${
-                      transaction.type === "income"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    {transaction.type === "income" ? "+" : "-"}
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-10 sm:py-12">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-xl bg-gray-100 flex items-center justify-center">
+                <Clock className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" />
+              </div>
+              <p className="text-gray-500 text-sm sm:text-base font-medium">
+                Belum ada transaksi
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Quick Stats Panel */}
+        <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-7 mb-8 shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center gap-3 mb-5 sm:mb-7">
+            <div className="p-2.5 rounded-lg bg-gray-50">
+              <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+              Statistik Cepat
+            </h2>
+          </div>
+
+          <div className="space-y-6 sm:space-y-8">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm sm:text-base font-semibold text-gray-700">
+                  Rasio Pengeluaran
+                </span>
+                <span className="text-sm sm:text-base font-bold text-gray-900 bg-gray-100 px-3 py-1.5 rounded-full">
+                  {dashboardStats.monthlyIncome > 0
+                    ? (
+                        (dashboardStats.monthlyExpense /
+                          dashboardStats.monthlyIncome) *
+                        100
+                      ).toFixed(1)
+                    : 0}
+                  %
+                </span>
+              </div>
+              <div className="relative">
+                <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 overflow-hidden">
+                  <div
+                    className="bg-red-500 h-full rounded-full transition-all duration-700 ease-out"
+                    style={{
+                      width: `${Math.min(
+                        dashboardStats.monthlyIncome > 0
+                          ? (dashboardStats.monthlyExpense /
+                              dashboardStats.monthlyIncome) *
+                              100
+                          : 0,
+                        100
+                      )}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-white">
+                    <BarChart3 className="w-4 h-4 text-gray-600" />
+                  </div>
+                  <span className="text-sm sm:text-base font-semibold text-gray-700">
+                    Rata-rata per Transaksi
+                  </span>
+                </div>
+                <span className="text-sm sm:text-lg font-bold text-gray-900">
+                  <span className="sm:hidden">
+                    {formatCurrencyCompact(
+                      dashboardStats.transactionCount > 0
+                        ? (dashboardStats.monthlyIncome +
+                            dashboardStats.monthlyExpense) /
+                            dashboardStats.transactionCount
+                        : 0
+                    )}
+                  </span>
+                  <span className="hidden sm:inline">
+                    {formatCurrency(
+                      dashboardStats.transactionCount > 0
+                        ? (dashboardStats.monthlyIncome +
+                            dashboardStats.monthlyExpense) /
+                            dashboardStats.transactionCount
+                        : 0
+                    )}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-4 sm:pt-6 border-t border-gray-200">
+              <p className="text-sm sm:text-base text-gray-600 mb-3 font-medium">
+                Perbandingan dengan bulan lalu:
+              </p>
+              <div
+                className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 ${
+                  dashboardStats.balanceChange >= 0
+                    ? "text-green-700 bg-green-50 border-green-200"
+                    : "text-red-700 bg-red-50 border-red-200"
+                }`}
+              >
+                <div
+                  className={`p-2 rounded-lg ${
+                    dashboardStats.balanceChange >= 0
+                      ? "bg-green-100"
+                      : "bg-red-100"
+                  }`}
+                >
+                  {dashboardStats.balanceChange >= 0 ? (
+                    <TrendingUp className="w-5 h-5 flex-shrink-0" />
+                  ) : (
+                    <TrendingDown className="w-5 h-5 flex-shrink-0" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm sm:text-base font-bold mb-1">
                     <span className="sm:hidden">
-                      {formatCurrencyCompact(Number(transaction.amount))}
+                      {formatCurrencyCompact(
+                        Math.abs(dashboardStats.balanceChange)
+                      )}
                     </span>
                     <span className="hidden sm:inline">
-                      {formatCurrency(Number(transaction.amount))}
+                      {formatCurrency(Math.abs(dashboardStats.balanceChange))}
                     </span>
+                    {dashboardStats.balanceChange >= 0
+                      ? " lebih baik"
+                      : " lebih buruk"}
+                  </p>
+                  <p className="text-xs sm:text-sm opacity-80">
+                    {dashboardStats.balanceChange >= 0
+                      ? "Keuangan Anda meningkat!"
+                      : "Perlu evaluasi pengeluaran"}
                   </p>
                 </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8 sm:py-12">
-            <Clock className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
-            <p className="text-gray-500 text-sm sm:text-base">
-              Belum ada transaksi
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Quick Stats Panel - Mobile Layout */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">
-          Statistik Cepat
-        </h2>
-
-        <div className="space-y-4 sm:space-y-6">
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs sm:text-sm font-medium text-gray-600">
-                Rasio Pengeluaran
-              </span>
-              <span className="text-xs sm:text-sm font-semibold text-gray-900">
-                {dashboardStats.monthlyIncome > 0
-                  ? (
-                      (dashboardStats.monthlyExpense /
-                        dashboardStats.monthlyIncome) *
-                      100
-                    ).toFixed(1)
-                  : 0}
-                %
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-red-500 h-2 rounded-full transition-all duration-300"
-                style={{
-                  width: `${Math.min(
-                    dashboardStats.monthlyIncome > 0
-                      ? (dashboardStats.monthlyExpense /
-                          dashboardStats.monthlyIncome) *
-                          100
-                      : 0,
-                    100
-                  )}%`,
-                }}
-              ></div>
-            </div>
-          </div>
-
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs sm:text-sm font-medium text-gray-600">
-                Rata-rata per Transaksi
-              </span>
-              <span className="text-xs sm:text-sm font-semibold text-gray-900">
-                <span className="sm:hidden">
-                  {formatCurrencyCompact(
-                    dashboardStats.transactionCount > 0
-                      ? (dashboardStats.monthlyIncome +
-                          dashboardStats.monthlyExpense) /
-                          dashboardStats.transactionCount
-                      : 0
-                  )}
-                </span>
-                <span className="hidden sm:inline">
-                  {formatCurrency(
-                    dashboardStats.transactionCount > 0
-                      ? (dashboardStats.monthlyIncome +
-                          dashboardStats.monthlyExpense) /
-                          dashboardStats.transactionCount
-                      : 0
-                  )}
-                </span>
-              </span>
-            </div>
-          </div>
-
-          <div className="pt-3 sm:pt-4 border-t border-gray-200">
-            <p className="text-xs sm:text-sm text-gray-600 mb-2">
-              Perbandingan dengan bulan lalu:
-            </p>
-            <div
-              className={`flex items-center gap-2 ${
-                dashboardStats.balanceChange >= 0
-                  ? "text-green-600"
-                  : "text-red-600"
-              }`}
-            >
-              {dashboardStats.balanceChange >= 0 ? (
-                <TrendingUp className="w-4 h-4 flex-shrink-0" />
-              ) : (
-                <TrendingDown className="w-4 h-4 flex-shrink-0" />
-              )}
-              <span className="text-xs sm:text-sm font-medium">
-                <span className="sm:hidden">
-                  {formatCurrencyCompact(
-                    Math.abs(dashboardStats.balanceChange)
-                  )}
-                </span>
-                <span className="hidden sm:inline">
-                  {formatCurrency(Math.abs(dashboardStats.balanceChange))}
-                </span>
-                {dashboardStats.balanceChange >= 0
-                  ? " lebih baik"
-                  : " lebih buruk"}
-              </span>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Budget Widget */}
-      <BudgetWidget />
+        {/* Budget Widget */}
+        <BudgetWidget />
+      </div>
     </div>
   );
 }
