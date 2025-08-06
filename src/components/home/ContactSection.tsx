@@ -7,7 +7,8 @@ export default function ContactSection() {
           Hubungi <span className="text-green-600">Kami</span>
         </h2>
         <p className="text-gray-600 text-center mb-10 max-w-xl mx-auto">
-          Punya pertanyaan atau butuh bantuan? Kami siap membantu. Kirimkan pesan melalui formulir di bawah ini.
+          Punya pertanyaan atau butuh bantuan? Kami siap membantu. Kirimkan
+          pesan melalui formulir di bawah ini.
         </p>
 
         <form className="space-y-6">
@@ -24,7 +25,6 @@ export default function ContactSection() {
             />
           </div>
           <textarea
-            rows="5"
             placeholder="Pesan kamu..."
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
           ></textarea>
